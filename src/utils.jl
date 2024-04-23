@@ -8,7 +8,7 @@ function _obtain_curve_parametrization(φ,trange)
 
     φcurve = φ.(trange)
     φp = φp_func.(trange)
-    normals = [Point2D(c[2],-c[1]) for c in φp]
+    normals = [Point2D(c[2],-c[1])/norm(c) for c in φp]
     φpp = φpp_func.(trange)
     return φcurve,φp,normals,φpp
 end
