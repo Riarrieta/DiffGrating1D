@@ -8,5 +8,6 @@ using ForwardDiff
 include("utils.jl")
 include("quadrature.jl")
 include("kernels.jl")
+include("matrix_discretization.jl")
 
 end # module DiffGrating1D

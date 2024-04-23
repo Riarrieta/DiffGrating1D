@@ -16,7 +16,6 @@ struct QPoint
     ttx::Float64
     tty::Float64
 end
-
 param(q::QPoint) = q.t
 point(q::QPoint) = q.x,q.y
 tvector(q::QPoint) = q.tx,q.ty
@@ -27,6 +26,10 @@ ttvector(q::QPoint) = q.ttx,q.tty
 distance(q1::QPoint,q2::QPoint) = sqrt((q1.x-q2.x)^2+(q1.y-q2.y)^2)
 
 struct Domain
-    k::Float64                 # wavenumber
+    n::Int64     # number of points = 2n
+    k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
 end
+wavenumber(d::Domain) = d.k
+nunknowns(d::Domain) = 2*d.n
+qpoint(d::Domain,i::Integer) = d.quad[i]

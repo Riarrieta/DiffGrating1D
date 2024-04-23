@@ -1,12 +1,15 @@
 
-function double_layer_kernel(t::QPoint,τ::QPoint,k)
+function double_layer_kernel(tx,ty,τ::QPoint,k)
     # actually, -2*D, where D is the double layer kernel
-    tx,ty = point(t)
     τx,τy = point(τ)
     τx_p,τy_p = tvector(τ)
-    tτnorm = distance(t,τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
     L = im*k/2*(τy_p*(τx-tx)-τx_p*(τy-ty))*hankel1(k*tτnorm)/tτnorm
     return L
+end
+function double_layer_kernel(t::QPoint,τ::QPoint,k)
+    tx,ty = point(t)
+    return double_layer_kernel(tx,ty,τ,k)
 end
 function double_layer_kernel_L1_L2(t::QPoint,τ::QPoint,k)
     # L1
@@ -30,18 +33,19 @@ function double_layer_kernel_L1_L2(t::QPoint,τ::QPoint,k)
     return L1,L2
 end
 
-function single_layer_kernel(t::QPoint,τ::QPoint,k)
+function single_layer_kernel(tx,ty,τ::QPoint,k)
     # actually, -2*S, where S is the single layer kernel
     τ_pnorm = tnorm(τ)
-    tτnorm = distance(t,τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
     M = im/2*hankel0(k*tτnorm)*τ_pnorm
     return M
 end
+function single_layer_kernel(t::QPoint,τ::QPoint,k)
+    tx,ty = point(t)
+    return single_layer_kernel(tx,ty,τ,k)
+end
 function single_layer_kernel_M1_M2(t::QPoint,τ::QPoint,k)
     # M1
-    tx,ty = point(t)
-    τx,τy = point(τ)
-    τx_p,τy_p = tvector(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = distance(t,τ)
     M1 = -1/(2π)*besselj0(k*tτnorm)*τ_pnorm
