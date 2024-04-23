@@ -6,5 +6,7 @@ using SpecialFunctions
 using ForwardDiff
 
 include("utils.jl")
+include("quadrature.jl")
+include("kernels.jl")
 
 end # module DiffGrating1D

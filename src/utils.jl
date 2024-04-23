@@ -1,4 +1,7 @@
 
+hankel0(x) = hankelh1(0,x)  # Hankel function of first kind, order 0
+hankel1(x) = hankelh1(1,x)  # Hankel function of first kind, order 1
+
 const Point2D = SVector{2,T} where T
 const Point3D = SVector{3,T} where T
 
