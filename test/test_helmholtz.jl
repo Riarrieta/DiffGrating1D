@@ -46,14 +46,9 @@ sol_x0 = sol(x0)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
 
-sol_approx = zero(ComplexF64)
-for i in 1:N
-    u = sol_φ[i]
-    ∂u∂n = ∂sol∂n_φ[i]
-    q = domain.quad[i]
-    sol_approx += D(x0,q,k)*u - S(x0,q,k)*∂u∂n
-end
-sol_approx = sol_approx*π/domain.n
+Dpot = DF.double_layer_potential(domain,sol_φ)
+Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
+sol_approx = Dpot(x0) - Spot(x0)
 error = abs((sol_x0-sol_approx)/sol_x0)
 
 ## Test Green's representation exterior, u = planewave
@@ -65,14 +60,10 @@ sol_x0 = zero(ComplexF64)   # should be zero outside the domain
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
 
-sol_approx = zero(ComplexF64)
-for i in 1:N
-    u = sol_φ[i]
-    ∂u∂n = ∂sol∂n_φ[i]
-    q = domain.quad[i]
-    sol_approx += D(x0,q,k)*u - S(x0,q,k)*∂u∂n
-end
-sol_approx = sol_approx*π/domain.n
+Dpot = DF.double_layer_potential(domain,sol_φ)
+Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
+sol_approx = Dpot(x0) - Spot(x0)
+error = abs((sol_x0-sol_approx)/sol_x0)
 error = abs(sol_x0-sol_approx)
 
 ## Test Green's representation interior, u = G
@@ -84,12 +75,7 @@ sol_y0 = sol(y0)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
 
-sol_approx = zero(ComplexF64)
-for i in 1:N
-    u = sol_φ[i]
-    ∂u∂n = ∂sol∂n_φ[i]
-    q = domain.quad[i]
-    sol_approx += S(y0,q,k)*∂u∂n - D(y0,q,k)*u
-end
-sol_approx = sol_approx*π/domain.n
+Dpot = DF.double_layer_potential(domain,sol_φ)
+Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
+sol_approx = Spot(y0) - Dpot(y0)
 error = abs((sol_y0-sol_approx)/sol_y0)

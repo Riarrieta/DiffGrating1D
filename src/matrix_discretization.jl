@@ -1,4 +1,33 @@
 
+## Potentials
+function double_layer_potential(d::Domain,ϕ)
+    # computed with trapezoidal rule
+    function pot(x)
+        result = zero(ComplexF64)
+        for (ϕi,qi) in zip(ϕ,d.quad)
+            result += double_layer_kernel(x...,qi,d.k)*ϕi
+        end
+        result = (-0.5)*π/d.n*result # (-0.5) factor to correct the kernel
+        return result
+    end
+    return pot
+end
+
+function single_layer_potential(d::Domain,ϕ)
+    # computed with trapezoidal rule
+    function pot(x)
+        result = zero(ComplexF64)
+        for (ϕi,qi) in zip(ϕ,d.quad)
+            result += single_layer_kernel(x...,qi,d.k)*ϕi
+        end
+        result = (0.5)*π/d.n*result # (0.5) factor to correct the kernel
+        return result
+    end
+    return pot
+end
+
+## Operators
+
 function mk_weight(ti,tj,n)
     # Martensen and Kussmaul weights R_j(ti)^(n)
     d = ti-tj
