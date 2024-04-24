@@ -3,7 +3,8 @@ using ForwardDiff
 using Plots
 const DF = DiffGrating1D
 
-φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
+#φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))  # bean
+φ(t) = DF.Point2D(2*sin(t/2), -sin(t))  # boomerang with corner
 
 N = 50
 domain = DF.Domain(φ,0.0,N)
