@@ -63,7 +63,6 @@ sol_φ = [sol(DF.point(q)) for q in domain.quad]
 Dpot = DF.double_layer_potential(domain,sol_φ)
 Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
 sol_approx = Dpot(x0) - Spot(x0)
-error = abs((sol_x0-sol_approx)/sol_x0)
 error = abs(sol_x0-sol_approx)
 
 ## Test Green's representation interior, u = G
