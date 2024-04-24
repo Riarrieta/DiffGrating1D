@@ -91,3 +91,30 @@ function double_layer_kernel_laplace(t::QPoint,τ::QPoint)
     tx,ty = point(t)
     return double_layer_kernel_laplace(tx,ty,τ)
 end
+
+## Helmholtz (for testing purposes)
+
+function single_layer_kernel_helmholtz(tx,ty,τ::QPoint,k)
+    τx,τy = point(τ)
+    τ_pnorm = tnorm(τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
+    M = im/4*hankel0(k*tτnorm)*τ_pnorm
+    return M
+end
+function single_layer_kernel_helmholtz(t::QPoint,τ::QPoint,k)
+    tx,ty = point(t)
+    return single_layer_kernel_helmholtz(tx,ty,τ,k)
+end
+
+function double_layer_kernel_helmholtz(tx,ty,τ::QPoint,k)
+    τx,τy = point(τ)
+    τ_nx,τ_ny = normal(τ)
+    τ_pnorm = tnorm(τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
+    L = -k*im/4*hankel1(k*tτnorm)/tτnorm*dot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
+    return L
+end
+function double_layer_kernel_helmholtz(t::QPoint,τ::QPoint,k)
+    tx,ty = point(t)
+    return double_layer_kernel_helmholtz(tx,ty,τ,k)
+end
