@@ -17,11 +17,11 @@ struct QPoint
     tty::Float64
 end
 param(q::QPoint) = q.t
-point(q::QPoint) = q.x,q.y
-tvector(q::QPoint) = q.tx,q.ty
+point(q::QPoint) = Point2D(q.x,q.y)
+tvector(q::QPoint) = Point2D(q.tx,q.ty)
 tnorm(q::QPoint) = q.tnorm
 tnorm2(q::QPoint) = tnorm(q)^2
-nvector(q::QPoint) = q.nx,q.ny
+normal(q::QPoint) = Point2D(q.nx,q.ny)
 ttvector(q::QPoint) = q.ttx,q.tty
 distance(q1::QPoint,q2::QPoint) = sqrt((q1.x-q2.x)^2+(q1.y-q2.y)^2)
 
@@ -29,6 +29,7 @@ struct Domain
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
+    tarray       # parametrization's parameter
     φ            # parametrization
 end
 wavenumber(d::Domain) = d.k
@@ -56,5 +57,6 @@ function Domain(φ,k,N)
         q = QPoint(t,x,y,tx,ty,tnorm,nx,ny,ttx,tty)
         push!(quad,q)
     end
-    return Domain(n,k,quad,φ)
+    @assert length(quad) == N
+    return Domain(n,k,quad,tarray,φ)
 end

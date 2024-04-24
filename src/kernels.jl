@@ -1,4 +1,6 @@
 
+## Helmholtz
+
 function double_layer_kernel(tx,ty,τ::QPoint,k)
     # actually, -2*D, where D is the double layer kernel
     τx,τy = point(τ)
@@ -34,7 +36,8 @@ function double_layer_kernel_L1_L2(t::QPoint,τ::QPoint,k)
 end
 
 function single_layer_kernel(tx,ty,τ::QPoint,k)
-    # actually, -2*S, where S is the single layer kernel
+    # actually, 2*S, where S is the single layer kernel
+    τx,τy = point(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
     M = im/2*hankel0(k*tτnorm)*τ_pnorm
@@ -62,3 +65,29 @@ function single_layer_kernel_M1_M2(t::QPoint,τ::QPoint,k)
     return M1,M2
 end
 
+## Laplace
+
+function single_layer_kernel_laplace(tx,ty,τ::QPoint)
+    τx,τy = point(τ)
+    τ_pnorm = tnorm(τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
+    M = -1/(2π)*log(tτnorm)*τ_pnorm
+    return M
+end
+function single_layer_kernel_laplace(t::QPoint,τ::QPoint)
+    tx,ty = point(t)
+    return single_layer_kernel_laplace(tx,ty,τ)
+end
+
+function double_layer_kernel_laplace(tx,ty,τ::QPoint)
+    τx,τy = point(τ)
+    τ_nx,τ_ny = normal(τ)
+    τ_pnorm = tnorm(τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
+    L = -1/(2π)/(tτnorm)^2*dot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
+    return L
+end
+function double_layer_kernel_laplace(t::QPoint,τ::QPoint)
+    tx,ty = point(t)
+    return double_layer_kernel_laplace(tx,ty,τ)
+end
