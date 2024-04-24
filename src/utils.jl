@@ -2,6 +2,9 @@
 hankel0(x) = hankelh1(0,x)  # Hankel function of first kind, order 0
 hankel1(x) = hankelh1(1,x)  # Hankel function of first kind, order 1
 
+# real dot product, without conjugation
+rdot(a,b) = sum(i*j for (i,j) in zip(a,b))
+
 const Point2D = SVector{2,T} where T
 const Point3D = SVector{3,T} where T
 

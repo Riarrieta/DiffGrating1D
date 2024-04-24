@@ -19,7 +19,7 @@ S(x,τ,k) = 0.5*DF.single_layer_kernel(x[1],x[2],τ,k)  # single layer kernel
 # exact solution
 sol(x) = DF.besselj0(k*norm(x))
 sol_grad(x) = -k*DF.besselj1(k*norm(x))*x/norm(x)
-∂sol∂n(x,n) = dot(sol_grad(x),n)
+∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_y0 = sol(y0)
 #sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
@@ -39,7 +39,7 @@ k2 = 3.83170597020751  # zero of J1
 # exact solution
 sol(x) = DF.besselj0(k2*norm(x))
 sol_grad(x) = -k2*DF.besselj1(k2*norm(x))*x/norm(x)
-∂sol∂n(x,n) = dot(sol_grad(x),n)
+∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_y0 = sol(y0)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 #∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
@@ -56,11 +56,11 @@ error = abs((sol_y0-sol_approx)/sol_y0)
 
 ## interior test u = planewave
 # exact solution
-#sol(x) = exp(im*k*x[1])
-#sol_grad(x) = DF.Point2D(im*k*sol(x),0.0)
-sol(x) = DF.besselj0(k*norm(x-x0))
-sol_grad(x) = -k*DF.besselj1(k*norm(x-x0))*(x-x0)/norm(x-x0)
-∂sol∂n(x,n) = dot(sol_grad(x),n)
+sol(x) = exp(im*k*x[1])
+sol_grad(x) = DF.Point2D(im*k*sol(x),0.0)
+#sol(x) = DF.besselj0(k*norm(x-x0)) + im*DF.bessely0(k*norm(x-x0))
+#sol_grad(x) = -k*DF.besselj1(k*norm(x-x0))*(x-x0)/norm(x-x0) + im*-k*DF.bessely1(k*norm(x-x0))*(x-x0)/norm(x-x0)
+∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_y0 = sol(y0)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]

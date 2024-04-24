@@ -84,7 +84,7 @@ function double_layer_kernel_laplace(tx,ty,τ::QPoint)
     τ_nx,τ_ny = normal(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
-    L = -1/(2π)/(tτnorm)^2*dot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
+    L = -1/(2π)/(tτnorm)^2*rrdot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
     return L
 end
 function double_layer_kernel_laplace(t::QPoint,τ::QPoint)
@@ -111,7 +111,7 @@ function double_layer_kernel_helmholtz(tx,ty,τ::QPoint,k)
     τ_nx,τ_ny = normal(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
-    L = -k*im/4*hankel1(k*tτnorm)/tτnorm*dot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
+    L = -k*im/4*hankel1(k*tτnorm)/tτnorm*rdot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
     return L
 end
 function double_layer_kernel_helmholtz(t::QPoint,τ::QPoint,k)

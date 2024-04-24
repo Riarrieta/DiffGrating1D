@@ -49,7 +49,7 @@ error = abs(sol_x0-sol_approx)
 # exact solution
 sol(x) = log(norm(x))
 sol_grad(x) = 1/norm(x)^2*x
-∂sol∂n(x,n) = dot(sol_grad(x),n)
+∂sol∂n(x,n) = rdot(sol_grad(x),n)
 sol_x0 = sol(x0)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
@@ -68,7 +68,7 @@ error = abs((sol_x0-sol_approx)/sol_x0)
 # exact solution
 sol(x) = log(norm(x))
 sol_grad(x) = 1/norm(x)^2*x
-∂sol∂n(x,n) = dot(sol_grad(x),n)
+∂sol∂n(x,n) = rdot(sol_grad(x),n)
 sol_y0 = 0.0   # should be zero inside the domain
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
