@@ -6,15 +6,14 @@ const DF = DiffGrating1D
 φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
 
 N = 50
-tarray = range(0,2π-2π/N,N)
+domain = DF.Domain(φ,0.0,N)
 
-φcurve,φp,normals,φpp = DF._obtain_curve_parametrization(φ,tarray)
-curve_x = [c[1] for c in φcurve]
-curve_y = [c[2] for c in φcurve]
-φp_x = [c[1] for c in φp]
-φp_y = [c[2] for c in φp]
-normals_x = [c[1] for c in normals]
-normals_y = [c[2] for c in normals]
+curve_x = [q.x for q in domain.quad]
+curve_y = [q.y for q in domain.quad]
+φp_x = [q.tx for q in domain.quad]
+φp_y = [q.ty for q in domain.quad]
+normals_x = [q.nx for q in domain.quad]
+normals_y = [q.ny for q in domain.quad]
 
 ## plotting
 
@@ -22,12 +21,3 @@ plot()
 plot!(curve_x,curve_y,aspect_ratio=:equal)
 quiver!(curve_x, curve_y, quiver=(φp_x, φp_y))
 quiver!(curve_x, curve_y, quiver=(normals_x, normals_y))
-
-##
-using SpecialFunctions
-
-hankelh1(0,0.3)
-besselj0(0.3)+im*bessely0(0.3)
-hankelh1(1,0.3)
-besselj1(0.3)+im*bessely1(0.3)
-

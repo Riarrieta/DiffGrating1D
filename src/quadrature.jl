@@ -29,7 +29,32 @@ struct Domain
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
+    φ            # parametrization
 end
 wavenumber(d::Domain) = d.k
 nunknowns(d::Domain) = 2*d.n
 qpoint(d::Domain,i::Integer) = d.quad[i]
+
+function Domain(φ,k,N)
+    @assert iseven(N)
+    n = N ÷ 2
+    tarray = range(0,2π-2π/N,N)    # parameter in [0,2π)
+    φp_func(t)  = ForwardDiff.derivative(φ,t)       # first derivative
+    φpp_func(t) = ForwardDiff.derivative(φp_func,t) # second derivative
+    # construct grid
+    quad = QPoint[]
+    for t in tarray
+        x,y = φ(t)
+        # tangent vector
+        tx,ty = φp_func(t)
+        tnorm = sqrt(tx^2+ty^2)
+        # normal vector [Point2D(c[2],-c[1])/norm(c) for c in φp]
+        nx = ty/tnorm
+        ny = -tx/tnorm
+        # second derivative
+        ttx,tty = φpp_func(t)
+        q = QPoint(t,x,y,tx,ty,tnorm,nx,ny,ttx,tty)
+        push!(quad,q)
+    end
+    return Domain(n,k,quad,φ)
+end
