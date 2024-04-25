@@ -49,7 +49,7 @@ function Domain(φ,k,N)
         # tangent vector
         tx,ty = φp_func(t)
         tnorm = sqrt(tx^2+ty^2)
-        # normal vector [Point2D(c[2],-c[1])/norm(c) for c in φp]
+        # normal vector
         nx = ty/tnorm
         ny = -tx/tnorm
         # second derivative
@@ -59,4 +59,52 @@ function Domain(φ,k,N)
     end
     @assert length(quad) == N
     return Domain(n,k,quad,tarray,φ)
+end
+
+struct DomainWith1Corner
+    n::Int64     # number of points = 2n
+    k::Float64              # wavenumber
+    quad::Vector{QPoint}    # quadrature
+    tarray       # parametrization's parameter
+    φ            # parametrization
+    wprime::Vector{Float64} # first derivative of change of variables w
+end
+wavenumber(d::DomainWith1Corner) = d.k
+nunknowns(d::DomainWith1Corner) = 2*d.n
+qpoint(d::DomainWith1Corner,i::Integer) = d.quad[i]
+
+# graded mesh change of variable
+_vfunc(s,p) = (1/p-1/2)*((π-s)/π)^3 + 1/p*(s-π)/π+1/2
+_wfunc(s,p) = 2π*_vfunc(s,p)^p/(_vfunc(s,p)^p + _vfunc(2π-s,p)^p)
+_∂wfunc(s,p) = ForwardDiff.derivative((x) -> _wfunc(x,p),s)
+
+function DomainWith1Corner(φ,k,N,p)
+    @assert iseven(N)
+    @assert p ≥ 2
+    n = N ÷ 2
+    tarray = range(0,2π-2π/N,N)    # parameter in [0,2π)
+    φp_func(t)  = ForwardDiff.derivative(φ,t)       # first derivative
+    φpp_func(t) = ForwardDiff.derivative(φp_func,t) # second derivative
+    # construct grid
+    quad = QPoint[]
+    wprime = Float64[]
+    for t in tarray
+        w = _wfunc(t,p)
+        ∂w = _∂wfunc(t,p)
+        x,y = φ(w)
+        # tangent vector
+        tx,ty = φp_func(w)
+        tnorm = sqrt(tx^2+ty^2)
+        # normal vector 
+        nx = ty/tnorm
+        ny = -tx/tnorm
+        # second derivative
+        ttx,tty = φpp_func(w)
+        q = QPoint(w,x,y,tx,ty,tnorm,nx,ny,ttx,tty)
+        push!(quad,q)
+        push!(wprime,∂w)
+    end
+    wprime[1] = NaN   # the first node (the corner) is never used, set to NaN just in case
+    @assert length(quad) == length(wprime) == N
+    return DomainWith1Corner(n,k,quad,tarray,φ,wprime)
 end

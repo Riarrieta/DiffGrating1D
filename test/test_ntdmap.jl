@@ -6,6 +6,7 @@ const DF = DiffGrating1D
 φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
 
 N = 50
+Nhalf = N÷2
 k = 1.5
 domain = DF.Domain(φ,k,N)
 
@@ -27,6 +28,27 @@ Smatrix = DF.single_layer_matrix(domain)
 ## Ntd map
 sol_φ_approx = Dmatrix \ (Smatrix*∂sol∂n_φ)
 err_ntd = maximum(abs.(sol_φ_approx-sol_φ))/maximum(abs.(sol_φ))
+
+## use NtD map to solve for sol_φ[1:N/2] and ∂sol∂n_φ[1:N/2] 
+# using sol_φ[N/2-1:end] and ∂sol∂n_φ[N/2-1:end]
+D1 = @view Dmatrix[:,1:Nhalf]
+D2 = @view Dmatrix[:,Nhalf+1:end]
+S1 = @view Smatrix[:,1:Nhalf]
+S2 = @view Smatrix[:,Nhalf+1:end]
+sol_φ1 = @view sol_φ[1:Nhalf]
+sol_φ2 = @view sol_φ[Nhalf+1:end]
+∂sol∂n_φ1 = @view ∂sol∂n_φ[1:Nhalf]
+∂sol∂n_φ2 = @view ∂sol∂n_φ[Nhalf+1:end]
+
+Zmatrix = [D1 -S1]
+rhs = -D2*sol_φ2 + S2*∂sol∂n_φ2
+uapprox = Zmatrix \ rhs
+utrue = vcat(sol_φ1,∂sol∂n_φ1)
+sol_φ1_approx = uapprox[1:Nhalf]
+∂sol∂n_φ1_approx = uapprox[Nhalf+1:end]
+err1 = maximum(abs.(sol_φ1_approx-sol_φ1))/maximum(abs.(sol_φ1))
+err2 = maximum(abs.(∂sol∂n_φ1_approx-∂sol∂n_φ1))/maximum(abs.(∂sol∂n_φ1))
+err3 = maximum(abs.(Zmatrix*utrue-rhs))
 
 ## Dtn map
 ∂sol∂n_φ_approx = Smatrix \ (Dmatrix*sol_φ)
