@@ -64,7 +64,7 @@ function single_layer_kernel_M1_M2(t::QPoint,τ::QPoint,k)
     # correction of diagonal term, in case a change of variable is used
     ∂w = wprime(τ)
     is_change_of_variable_used = !isnan(∂w)
-    M2_diag = M2_diag + (is_change_of_variable_used)*(2*log(∂w))
+    M2_diag = M2_diag + (is_change_of_variable_used)*(2*log(∂w)*M1)
     M2 = (are_equal)*M2_diag + (!are_equal)*M2
     return M1,M2
 end

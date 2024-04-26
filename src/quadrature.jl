@@ -109,7 +109,8 @@ function DomainWith1Corner(φ,k,N,p)
         ny = -tx/tnorm
         # second derivative
         ttx,tty = φpp_func(w)
-        q = QPoint(w,x,y,tx,ty,tnorm,nx,ny,ttx,tty,∂w)
+        # we need to store the uniform t-parameter in the QPoint!
+        q = QPoint(t,x,y,tx,ty,tnorm,nx,ny,ttx,tty,∂w)
         push!(quad,q)
     end
     @assert length(quad) == N
