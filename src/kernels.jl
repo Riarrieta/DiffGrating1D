@@ -61,11 +61,34 @@ function single_layer_kernel_M1_M2(t::QPoint,τ::QPoint,k)
     C = Base.MathConstants.eulergamma
     t_pnorm = tnorm(t)
     M2_diag = (im/2-C/π-1/π*log(k/2*t_pnorm))*t_pnorm
+    # correction of diagonal term, in case a change of variable is used
+    ∂w = wprime(τ)
+    is_change_of_variable_used = !isnan(∂w)
+    M2_diag = M2_diag + (is_change_of_variable_used)*(2*log(∂w))
     M2 = (are_equal)*M2_diag + (!are_equal)*M2
     return M1,M2
 end
 
-## Laplace
+## Corrections, for domains with corners
+function double_layer_kernel_laplace_correction(tx,ty,τ::QPoint)
+    τx,τy = point(τ)
+    τx_p,τy_p = tvector(τ)
+    τx_pp,τy_pp = ttvector(τ)
+    τ_pnorm = tnorm(τ)
+    tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
+    H = 1/π*(τy_p*(tx-τx)-τx_p*(ty-τy))/tτnorm^2
+    # diagonal term
+    are_equal = iszero(tτnorm)
+    Hdiag = 1/π*(τy_p*τx_pp-τx_p*τy_pp)/τ_pnorm^2
+    H = (are_equal)*Hdiag + (!are_equal)*H
+    return H
+end
+function double_layer_kernel_laplace_correction(t::QPoint,τ::QPoint)
+    tx,ty = point(t)
+    return double_layer_kernel_laplace_correction(tx,ty,τ)
+end
+
+## Laplace (for testing purposes)
 
 function single_layer_kernel_laplace(tx,ty,τ::QPoint)
     τx,τy = point(τ)

@@ -15,6 +15,9 @@ struct QPoint
     # second derivative
     ttx::Float64
     tty::Float64
+    # derivative of change of variable
+    # not used if change of variable is identity
+    wprime::Float64
 end
 param(q::QPoint) = q.t
 point(q::QPoint) = Point2D(q.x,q.y)
@@ -24,6 +27,7 @@ tnorm2(q::QPoint) = tnorm(q)^2
 normal(q::QPoint) = Point2D(q.nx,q.ny)
 ttvector(q::QPoint) = q.ttx,q.tty
 distance(q1::QPoint,q2::QPoint) = sqrt((q1.x-q2.x)^2+(q1.y-q2.y)^2)
+wprime(q::QPoint) = q.wprime
 
 struct Domain
     n::Int64     # number of points = 2n
@@ -54,7 +58,8 @@ function Domain(φ,k,N)
         ny = -tx/tnorm
         # second derivative
         ttx,tty = φpp_func(t)
-        q = QPoint(t,x,y,tx,ty,tnorm,nx,ny,ttx,tty)
+        wprime = NaN   # set to NaN, since it is not used here
+        q = QPoint(t,x,y,tx,ty,tnorm,nx,ny,ttx,tty,wprime)
         push!(quad,q)
     end
     @assert length(quad) == N
@@ -67,7 +72,6 @@ struct DomainWith1Corner
     quad::Vector{QPoint}    # quadrature
     tarray       # parametrization's parameter
     φ            # parametrization
-    wprime::Vector{Float64} # first derivative of change of variables w
 end
 wavenumber(d::DomainWith1Corner) = d.k
 nunknowns(d::DomainWith1Corner) = 2*d.n
@@ -87,9 +91,12 @@ function DomainWith1Corner(φ,k,N,p)
     φpp_func(t) = ForwardDiff.derivative(φp_func,t) # second derivative
     # construct grid
     quad = QPoint[]
-    wprime = Float64[]
     for t in tarray
         w = _wfunc(t,p)
+        # the first node (the corner) is never used, set to NaN just in case
+        if iszero(t)
+            w = NaN
+        end
         ∂w = _∂wfunc(t,p)
         x,y = φ(w)
         # tangent vector
@@ -100,11 +107,9 @@ function DomainWith1Corner(φ,k,N,p)
         ny = -tx/tnorm
         # second derivative
         ttx,tty = φpp_func(w)
-        q = QPoint(w,x,y,tx,ty,tnorm,nx,ny,ttx,tty)
+        q = QPoint(w,x,y,tx,ty,tnorm,nx,ny,ttx,tty,∂w)
         push!(quad,q)
-        push!(wprime,∂w)
     end
-    wprime[1] = NaN   # the first node (the corner) is never used, set to NaN just in case
-    @assert length(quad) == length(wprime) == N
-    return DomainWith1Corner(n,k,quad,tarray,φ,wprime)
+    @assert length(quad) == N
+    return DomainWith1Corner(n,k,quad,tarray,φ)
 end
