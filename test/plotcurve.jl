@@ -32,7 +32,7 @@ plot(sarray,w,label="w")
 plot!(sarray,∂w,label="∂w")
 
 ## plot grade mesh
-φ(t) = DF.Point2D(2*sin(t/2), -sin(t))  # boomerang with corner
+φ(t) = DF.Point2D(2*sin(t/2)-1, -sin(t))  # boomerang with corner
 
 N = 50
 p = 5

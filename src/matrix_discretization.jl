@@ -19,7 +19,7 @@ function double_layer_potential(d::DomainWith1Corner,ϕ)
         for i in 2:nunknowns(d)  # skip corner, since w'(corner) = 0
             ϕi = ϕ[i]
             qi = d.quad[i]
-            ∂wi = d.wprime[i]
+            ∂wi = wprime(qi)
             result += double_layer_kernel(x...,qi,d.k)*ϕi*∂wi
         end
         result = (-0.5)*π/d.n*result # (-0.5) factor to correct the kernel
@@ -47,7 +47,7 @@ function single_layer_potential(d::DomainWith1Corner,ϕ)
         for i in 2:nunknowns(d)  # skip corner, since w'(corner) = 0
             ϕi = ϕ[i]
             qi = d.quad[i]
-            ∂wi = d.wprime[i]
+            ∂wi = wprime(qi)
             result += single_layer_kernel(x...,qi,d.k)*ϕi*∂wi
         end
         result = (0.5)*π/d.n*result # (0.5) factor to correct the kernel
@@ -63,7 +63,7 @@ function mk_weight(ti,tj,n)
     d = ti-tj
     return -2π/n*sum(1/m*cos(m*d) for m in 1:n-1) - π/n^2*cos(n*d)
 end
-function mk_weight(qi::QPoint,qj::QPoint,d::Domain)
+function mk_weight(qi::QPoint,qj::QPoint,d::AbstractDomain)
     return mk_weight(param(qi),param(qj),d.n)
 end
 

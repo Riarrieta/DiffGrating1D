@@ -10,7 +10,7 @@ const Point3D = SVector{3,T} where T
 
 # curves
 curve_bean(t) = Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
-curve_sharp_boomerang(t) = DF.Point2D(2*sin(t/2), -sin(t))
+curve_sharp_boomerang(t) = Point2D(2*sin(t/2)-1, -sin(t))  # boomerang with corner
 
 function _obtain_curve_parametrization(φ,trange)
     φp_func(t)  = ForwardDiff.derivative(φ,t)

@@ -29,7 +29,9 @@ ttvector(q::QPoint) = q.ttx,q.tty
 distance(q1::QPoint,q2::QPoint) = sqrt((q1.x-q2.x)^2+(q1.y-q2.y)^2)
 wprime(q::QPoint) = q.wprime
 
-struct Domain
+abstract type AbstractDomain end
+
+struct Domain <: AbstractDomain
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
@@ -66,7 +68,7 @@ function Domain(φ,k,N)
     return Domain(n,k,quad,tarray,φ)
 end
 
-struct DomainWith1Corner
+struct DomainWith1Corner <: AbstractDomain
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
@@ -93,11 +95,11 @@ function DomainWith1Corner(φ,k,N,p)
     quad = QPoint[]
     for t in tarray
         w = _wfunc(t,p)
-        # the first node (the corner) is never used, set to NaN just in case
-        if iszero(t)
-            w = NaN
-        end
         ∂w = _∂wfunc(t,p)
+        # the first node derivative (the corner) is never used, set to NaN just in case
+        if iszero(t)
+            ∂w = NaN
+        end
         x,y = φ(w)
         # tangent vector
         tx,ty = φp_func(w)
