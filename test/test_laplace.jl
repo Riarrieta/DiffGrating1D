@@ -14,6 +14,18 @@ x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 D(x,τ) = DF.double_layer_kernel_laplace(x[1],x[2],τ)  # double layer kernel
 S(x,τ) = DF.single_layer_kernel_laplace(x[1],x[2],τ)  # single layer kernel
 
+## test laplace kernels
+qindex = 12
+q = domain.quad[qindex]
+qtx,qty = DF.tvector(q)
+qttx,qtty = DF.ttvector(q)
+h = -0.001
+qclose = DF.Point2D(q.x + h*qtx + h^2/2*qttx,q.y + h*qty + h^2/2*qtty)
+H(x,τ) = DF.double_layer_kernel_laplace_correction(x[1],x[2],τ)  # double layer kernel for corner corrections
+@assert H(x0,q) ≈ 2*D(x0,q)
+@assert abs(H((q.x,q.y),q)-H(qclose,q)) < 1e-3
+@assert abs(H((q.x,q.y),q)-2*D(qclose,q)) < 1e-3
+
 ## Interior test
 # exact solution
 sol(x) = 1.0
@@ -29,6 +41,18 @@ for i in 1:N
 end
 sol_approx = sol_approx*π/domain.n
 error = abs((sol_y0-sol_approx)/sol_y0)
+
+## Test Green's representation interior, for H kernel
+qindex = 12
+sol_q0 = -1   # should be -1 at the domain boundary
+q0 = domain.quad[qindex]
+sol_approx = zero(ComplexF64)
+for i in 1:N
+    q = domain.quad[i]
+    sol_approx += H((q0.x,q0.y),q)*one(ComplexF64)
+end
+sol_approx = sol_approx*π/domain.n
+error = abs((sol_q0-sol_approx)/sol_y0)
 
 ## exterior test u = 1
 # exact solution

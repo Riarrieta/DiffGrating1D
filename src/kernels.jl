@@ -71,15 +71,16 @@ end
 
 ## Corrections, for domains with corners
 function double_layer_kernel_laplace_correction(tx,ty,τ::QPoint)
+    # actually, 2*D, where D is the double layer kernel
     τx,τy = point(τ)
     τx_p,τy_p = tvector(τ)
     τx_pp,τy_pp = ttvector(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
     H = 1/π*(τy_p*(tx-τx)-τx_p*(ty-τy))/tτnorm^2
-    # diagonal term
+    # diagonal term (a 1/2 factor is missing from Colton and Kress' book!)
     are_equal = iszero(tτnorm)
-    Hdiag = 1/π*(τy_p*τx_pp-τx_p*τy_pp)/τ_pnorm^2
+    Hdiag = 1/(2π)*(τy_p*τx_pp-τx_p*τy_pp)/τ_pnorm^2
     H = (are_equal)*Hdiag + (!are_equal)*H
     return H
 end
@@ -107,7 +108,7 @@ function double_layer_kernel_laplace(tx,ty,τ::QPoint)
     τ_nx,τ_ny = normal(τ)
     τ_pnorm = tnorm(τ)
     tτnorm = sqrt((tx-τx)^2+(ty-τy)^2)
-    L = -1/(2π)/(tτnorm)^2*rrdot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
+    L = -1/(2π)/(tτnorm)^2*rdot(Point2D{Float64}(τx-tx,τy-ty),Point2D{Float64}(τ_nx,τ_ny))*τ_pnorm
     return L
 end
 function double_layer_kernel_laplace(t::QPoint,τ::QPoint)
