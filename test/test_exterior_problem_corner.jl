@@ -7,8 +7,8 @@ const DF = DiffGrating1D
 #φ(t) = DF.curve_bean(t)
 
 k = 1.5
-N = 500
-p = 2
+N = 128
+p = 8
 domain = DF.DomainWith1Corner(φ,k,N,p)
 #domain = DF.Domain(φ,k,N)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
