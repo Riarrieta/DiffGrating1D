@@ -84,6 +84,14 @@ function double_layer_matrix_plus_identity(d::Domain)
     end
     return D
 end
+
+function corner_modification_function(qi::QPoint,corner_index_l::Int64,d::AbstractDomainWithCorners)
+    foo(j) = ifelse(j==corner_index_l,one(ComplexF64),distance(qi,qpoint(d,j))/distance(qpoint(d,corner_index_l),qpoint(d,j)))
+    return prod(foo(j) for j in corner_indices(d))
+end
+function corner_modification_function(r,corner_index_l,::DomainWith1Corner)
+    return one(ComplexF64)
+end
 function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
     N = nunknowns(d)
     n = d.n
@@ -111,6 +119,8 @@ function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
                 H = double_layer_kernel_laplace_correction(qi,ql)
                 D[i,j] += -π/n*H*∂wl
             end
+            # include correction function
+            D[i,j] = D[i,j]*corner_modification_function(qi,j,d)
             # add identity on diagonal
             D[i,j] = D[i,j] + (i==j)
         end

@@ -96,3 +96,9 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist)
     edge_indices = setdiff(1:N,corners_indices)  # global indices of edges
     return DomainMultipleCorners(n,k,quad,corners_indices,edge_indices,tarray,φlist)
 end
+
+## Common shapes
+function DomainSquare(k,N,p)
+    φlist,Nlist,plist = curves_square(N,p)
+    return DomainMultipleCorners(;φlist,k,Nlist,plist)
+end
