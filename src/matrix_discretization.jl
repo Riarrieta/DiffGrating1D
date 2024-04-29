@@ -12,7 +12,7 @@ function double_layer_potential(d::Domain,ϕ)
     end
     return pot
 end
-function double_layer_potential(d::DomainWith1Corner,ϕ)
+function double_layer_potential(d::AbstractDomainWithCorners,ϕ)
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
@@ -40,7 +40,7 @@ function single_layer_potential(d::Domain,ϕ)
     end
     return pot
 end
-function single_layer_potential(d::DomainWith1Corner,ϕ)
+function single_layer_potential(d::AbstractDomainWithCorners,ϕ)
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
@@ -84,7 +84,7 @@ function double_layer_matrix_plus_identity(d::Domain)
     end
     return D
 end
-function double_layer_matrix_plus_identity(d::DomainWith1Corner)
+function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
     N = nunknowns(d)
     n = d.n
     k = wavenumber(d)
@@ -133,7 +133,7 @@ function single_layer_matrix(d::Domain)
     end
     return D
 end
-function single_layer_matrix(d::DomainWith1Corner)
+function single_layer_matrix(d::AbstractDomainWithCorners)
     N = nunknowns(d)
     n = d.n
     k = wavenumber(d)

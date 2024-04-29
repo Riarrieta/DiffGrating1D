@@ -9,7 +9,8 @@ N = 128
 p = 8
 Nhalf = N÷2
 k = 1.5
-domain = DF.DomainWith1Corner(φ,k,N,p)
+#domain = DF.DomainWith1Corner(φ,k,N,p)
+domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 
 sol(x) = DF.hankel0(k*norm(x-x0))
@@ -27,8 +28,8 @@ sol_φ_approx = Dmatrix \ (Smatrix*∂sol∂n_φ)
 err_ntd = maximum(abs.(sol_φ_approx-sol_φ))/maximum(abs.(sol_φ))
 
 ## try Schur complement to eliminate corner variables
-cv = [1]    # corner variables
-ev = 2:N    # edge variables
+cv = DF.corner_indices(domain)    # corner variables
+ev = DF.edge_indices(domain)    # edge variables
 D1 = Dmatrix[cv,cv]
 D2 = Dmatrix[cv,ev]
 D3 = Dmatrix[ev,cv]
