@@ -1,5 +1,5 @@
 
-struct DomainMultipleCorners <: AbstractDomain
+struct DomainMultipleCorners <: AbstractDomainWithCorners
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
@@ -11,8 +11,10 @@ end
 wavenumber(d::DomainMultipleCorners) = d.k
 nunknowns(d::DomainMultipleCorners) = 2*d.n
 qpoint(d::DomainMultipleCorners,i::Integer) = d.quad[i]
-corners(d::DomainMultipleCorners) = (qpoint(d,i) for i in d.corner_indices)
-edges(d::DomainMultipleCorners) = (qpoint(d,i) for i in d.edge_indices)
+corner_indices(d::DomainMultipleCorners) = d.corner_indices
+corners(d::DomainMultipleCorners) = (qpoint(d,i) for i in corner_indices(d))
+edge_indices(d::DomainMultipleCorners) = d.edge_indices
+edges(d::DomainMultipleCorners) = (qpoint(d,i) for i in edge_indices(d))
 
 # graded mesh change of variable
 _ζfunc(s,si,sf) = (2*s-(si+sf))/(sf-si)

@@ -16,7 +16,7 @@ function double_layer_potential(d::DomainWith1Corner,ϕ)
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
-        for i in 2:nunknowns(d)  # skip corner, since w'(corner) = 0
+        for i in edge_indices(d)  # skip corners, since w'(corner) = 0
             ϕi = ϕ[i]
             qi = d.quad[i]
             ∂wi = wprime(qi)
@@ -44,7 +44,7 @@ function single_layer_potential(d::DomainWith1Corner,ϕ)
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
-        for i in 2:nunknowns(d)  # skip corner, since w'(corner) = 0
+        for i in edge_indices(d)  # skip corner, since w'(corner) = 0
             ϕi = ϕ[i]
             qi = d.quad[i]
             ∂wi = wprime(qi)
@@ -89,7 +89,7 @@ function double_layer_matrix_plus_identity(d::DomainWith1Corner)
     n = d.n
     k = wavenumber(d)
     D = Array{ComplexF64}(undef, N, N)
-    for j in 2:N # skip corner node j=1
+    for j in edge_indices(d) # skip corner nodes
         qj = qpoint(d,j)
         ∂wj = wprime(qj)
         for i in 1:N  
@@ -100,19 +100,21 @@ function double_layer_matrix_plus_identity(d::DomainWith1Corner)
             D[i,j] = D[i,j] + (i==j)
         end
     end
-    # corner node j=1
-    for i in 1:N  
-        qi = qpoint(d,i)
-        D[i,1] = -one(ComplexF64)
-        for l in 2:N # skip corner node
-            ql = qpoint(d,l)
-            ∂wl = wprime(ql)
-            H = double_layer_kernel_laplace_correction(qi,ql)
-            D[i,1] += -π/n*H*∂wl
+    # corner nodes
+    for j in corner_indices(d)
+        for i in 1:N  
+            qi = qpoint(d,i)
+            D[i,j] = -one(ComplexF64)
+            for l in edge_indices(d) # skip corner node
+                ql = qpoint(d,l)
+                ∂wl = wprime(ql)
+                H = double_layer_kernel_laplace_correction(qi,ql)
+                D[i,j] += -π/n*H*∂wl
+            end
+            # add identity on diagonal
+            D[i,j] = D[i,j] + (i==j)
         end
-        # add identity on diagonal
-        D[i,1] = D[i,1] + (i==1)
-    end
+    end 
     return D
 end
 

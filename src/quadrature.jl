@@ -30,6 +30,7 @@ distance(q1::QPoint,q2::QPoint) = sqrt((q1.x-q2.x)^2+(q1.y-q2.y)^2)
 wprime(q::QPoint) = q.wprime
 
 abstract type AbstractDomain end
+abstract type AbstractDomainWithCorners <: AbstractDomain end
 
 struct Domain <: AbstractDomain
     n::Int64     # number of points = 2n
@@ -68,7 +69,7 @@ function Domain(φ,k,N)
     return Domain(n,k,quad,tarray,φ)
 end
 
-struct DomainWith1Corner <: AbstractDomain
+struct DomainWith1Corner <: AbstractDomainWithCorners
     n::Int64     # number of points = 2n
     k::Float64              # wavenumber
     quad::Vector{QPoint}    # quadrature
@@ -78,6 +79,10 @@ end
 wavenumber(d::DomainWith1Corner) = d.k
 nunknowns(d::DomainWith1Corner) = 2*d.n
 qpoint(d::DomainWith1Corner,i::Integer) = d.quad[i]
+corner_indices(::DomainWith1Corner) = 1:1  # only first qnode is a corner 
+corners(d::DomainWith1Corner) = (qpoint(d,i) for i in corner_indices(d))
+edge_indices(d::DomainWith1Corner) = 2:nunknowns(d)
+edges(d::DomainWith1Corner) = (qpoint(d,i) for i in edge_indices(d))
 
 # graded mesh change of variable
 _vfunc(s,p) = (1/p-1/2)*((π-s)/π)^3 + 1/p*(s-π)/π+1/2
