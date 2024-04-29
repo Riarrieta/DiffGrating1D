@@ -50,3 +50,24 @@ plot()
 plot!(curve_x,curve_y,aspect_ratio=:equal)
 quiver!(curve_x, curve_y, quiver=(φp_x, φp_y))
 quiver!(curve_x, curve_y, quiver=(normals_x, normals_y))
+
+## Plot Domain with multiple corners
+N = 50
+p = 5
+φlist,Nlist,plist = DF.curves_square(N,p)
+k = 1.5
+
+domain = DF.DomainMultipleCorners(;φlist,k,Nlist,plist)
+
+curve_x = [q.x for q in domain.quad]
+curve_y = [q.y for q in domain.quad]
+φp_x = [q.tx for q in domain.quad]
+φp_y = [q.ty for q in domain.quad]
+normals_x = [q.nx for q in domain.quad]
+normals_y = [q.ny for q in domain.quad]
+
+## plotting
+plot()
+plot!(curve_x,curve_y,aspect_ratio=:equal)
+quiver!(curve_x, curve_y, quiver=(φp_x, φp_y))
+quiver!(curve_x, curve_y, quiver=(normals_x, normals_y))
