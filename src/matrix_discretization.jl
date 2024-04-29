@@ -138,7 +138,7 @@ function single_layer_matrix(d::DomainWith1Corner)
     n = d.n
     k = wavenumber(d)
     D = Array{ComplexF64}(undef, N, N)
-    for j in 2:N # skip corner node j=1
+    for j in edge_indices(d) # skip corner nodes
         qj = qpoint(d,j)
         ∂wj = wprime(qj)
         for i in 1:N  
@@ -147,9 +147,11 @@ function single_layer_matrix(d::DomainWith1Corner)
             D[i,j] = (mk_weight(qi,qj,d)*M1 + π/n*M2)*∂wj
         end
     end
-    # corner node j=1
-    for i in 1:N  
-        D[i,1] = zero(ComplexF64)
+    # corner nodes
+    for j in corner_indices(d)
+        for i in 1:N  
+            D[i,j] = zero(ComplexF64)
+        end
     end
     return D
 end
