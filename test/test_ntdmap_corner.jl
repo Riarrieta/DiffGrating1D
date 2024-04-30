@@ -3,7 +3,7 @@ using LinearAlgebra
 using Plots
 const DF = DiffGrating1D
 
-φ(t) = DF.curve_sharp_boomerang(t)
+#φ(t) = DF.curve_sharp_boomerang(t)
 #φ(t) = DF.curve_bean(t)
 
 N = 64
@@ -11,8 +11,8 @@ p = 8
 Nhalf = N÷2
 k = 1.5
 #domain = DF.DomainWith1Corner(φ,k,N,p)
-domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
-#domain = DF.DomainSquare(k,N,p)
+#domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
+domain = DF.DomainSquare(k,N,p)
 #domain = DF.Domain(φ, k,N)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 
@@ -45,10 +45,6 @@ rhsmatrix = (S4-D3*(D1\S2))
 rhs2 = rhsmatrix*∂sol∂n_φ[ev]
 sol_φ_edge_approx = D_D1 \ rhs2
 err_ntd_norcorner = maximum(abs.(sol_φ_edge_approx-sol_φ[ev]))/maximum(abs.(sol_φ[ev]))
-
-
-
-
 
 
 
