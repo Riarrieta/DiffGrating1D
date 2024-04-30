@@ -40,9 +40,10 @@ function _check_closed_curves(curves)
     !check && @info "" Tuple(φ1(2π)) Tuple(φ2(0.0)) norm(φ1(2π)-φ2(0.0))
     return check
 end
-function DomainMultipleCorners(;φlist,k,Nlist,plist)
+function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true)
     @assert length(φlist) == length(Nlist) == length(plist)
     @assert _check_closed_curves(φlist)
+    orientation = counterclockwise ? 1 : -1
     N = sum(Nlist)   # total number of nodes
     n = N ÷ 2
     tarray = range(0,2π-2π/N,N)    # global parameter in [0,2π)
@@ -78,7 +79,7 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist)
             end
             x,y = φ(w)
             # tangent vector
-            tx,ty = φp_func(w)
+            tx,ty = φp_func(w)*orientation
             tnorm = sqrt(tx^2+ty^2)
             # normal vector 
             nx = ty/tnorm
@@ -102,11 +103,21 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist)
 end
 
 ## Common shapes
-function DomainSquare(k,N,p)
+function DomainSquare(k,N,p;counterclockwise=true)
     φlist,Nlist,plist = curves_square(N,p)
-    return DomainMultipleCorners(;φlist,k,Nlist,plist)
+    if !counterclockwise
+        φlist = _reverse_parametrizations(φlist)
+        Nlist = Nlist[end:-1:1]
+        plist = plist[end:-1:1]
+    end
+    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise)
 end
-function DomainCosines(k,N,p)
+function DomainCosines(k,N,p;counterclockwise=true)
     φlist,Nlist,plist = curves_cosines(N,p)
-    return DomainMultipleCorners(;φlist,k,Nlist,plist)
+    if !counterclockwise
+        φlist = _reverse_parametrizations(φlist)
+        Nlist = Nlist[end:-1:1]
+        plist = plist[end:-1:1]
+    end
+    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise)
 end

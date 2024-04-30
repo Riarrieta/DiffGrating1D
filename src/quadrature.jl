@@ -44,8 +44,9 @@ nunknowns(d::Domain) = 2*d.n
 qpoint(d::Domain,i::Integer) = d.quad[i]
 Domain(d::AbstractDomain) = Domain(d.n,d.k,d.quad,nothing,nothing)
 
-function Domain(φ,k,N)
+function Domain(φ,k,N;counterclockwise=true)
     @assert iseven(N)
+    orientation = counterclockwise ? 1 : -1
     n = N ÷ 2
     tarray = range(0,2π-2π/N,N)    # parameter in [0,2π)
     φp_func(t)  = ForwardDiff.derivative(φ,t)       # first derivative
@@ -55,7 +56,7 @@ function Domain(φ,k,N)
     for t in tarray
         x,y = φ(t)
         # tangent vector
-        tx,ty = φp_func(t)
+        tx,ty = φp_func(t)*orientation
         tnorm = sqrt(tx^2+ty^2)
         # normal vector
         nx = ty/tnorm
@@ -90,9 +91,10 @@ _vfunc(s,p) = (1/p-1/2)*((π-s)/π)^3 + 1/p*(s-π)/π+1/2
 _wfunc(s,p) = 2π*_vfunc(s,p)^p/(_vfunc(s,p)^p + _vfunc(2π-s,p)^p)
 _∂wfunc(s,p) = ForwardDiff.derivative((x) -> _wfunc(x,p),s)
 
-function DomainWith1Corner(φ,k,N,p)
+function DomainWith1Corner(φ,k,N,p;counterclockwise=true)
     @assert iseven(N)
     @assert p ≥ 2
+    orientation = counterclockwise ? 1 : -1
     n = N ÷ 2
     tarray = range(0,2π-2π/N,N)    # parameter in [0,2π)
     φp_func(t)  = ForwardDiff.derivative(φ,t)       # first derivative
@@ -108,7 +110,7 @@ function DomainWith1Corner(φ,k,N,p)
         end
         x,y = φ(w)
         # tangent vector
-        tx,ty = φp_func(w)
+        tx,ty = φp_func(w)*orientation
         tnorm = sqrt(tx^2+ty^2)
         # normal vector 
         nx = ty/tnorm
