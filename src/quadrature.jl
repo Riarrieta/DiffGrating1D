@@ -42,6 +42,7 @@ end
 wavenumber(d::Domain) = d.k
 nunknowns(d::Domain) = 2*d.n
 qpoint(d::Domain,i::Integer) = d.quad[i]
+Domain(d::AbstractDomain) = Domain(d.n,d.k,d.quad,nothing,nothing)
 
 function Domain(φ,k,N)
     @assert iseven(N)

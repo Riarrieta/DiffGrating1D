@@ -31,11 +31,13 @@ function _check_closed_curves(curves)
         φ1 = curves[i]
         φ2 = curves[i+1]
         check &= φ1(2π) ≈ φ2(0.0)
+        !check && @info "" Tuple(φ1(2π)) Tuple(φ2(0.0)) norm(φ1(2π)-φ2(0.0))
     end
     # check last curve
     φ1 = curves[end]
     φ2 = curves[1]
     check &= φ1(2π) ≈ φ2(0.0)
+    !check && @info "" Tuple(φ1(2π)) Tuple(φ2(0.0)) norm(φ1(2π)-φ2(0.0))
     return check
 end
 function DomainMultipleCorners(;φlist,k,Nlist,plist)
@@ -100,5 +102,9 @@ end
 ## Common shapes
 function DomainSquare(k,N,p)
     φlist,Nlist,plist = curves_square(N,p)
+    return DomainMultipleCorners(;φlist,k,Nlist,plist)
+end
+function DomainCosines(k,N,p)
+    φlist,Nlist,plist = curves_cosines(N,p)
     return DomainMultipleCorners(;φlist,k,Nlist,plist)
 end

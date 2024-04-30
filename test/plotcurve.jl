@@ -4,7 +4,9 @@ using Plots
 const DF = DiffGrating1D
 
 #φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))  # bean
-φ(t) = DF.Point2D(2*sin(t/2), -sin(t))  # boomerang with corner
+#φ(t) = DF.Point2D(2*sin(t/2), -sin(t))  # boomerang with corner
+#φ(t) = DF._curve_square(t)
+φ(t) = DF._curve_cosines(t)
 
 N = 50
 domain = DF.Domain(φ,0.0,N)
@@ -54,7 +56,8 @@ quiver!(curve_x, curve_y, quiver=(normals_x, normals_y))
 ## Plot Domain with multiple corners
 N = 50
 p = 5
-φlist,Nlist,plist = DF.curves_square(N,p)
+#φlist,Nlist,plist = DF.curves_square(N,p)
+φlist,Nlist,plist = DF.curves_cosines(N,p)
 k = 1.5
 
 domain = DF.DomainMultipleCorners(;φlist,k,Nlist,plist)

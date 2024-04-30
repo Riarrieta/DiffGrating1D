@@ -86,10 +86,12 @@ function double_layer_matrix_plus_identity(d::Domain)
 end
 
 function corner_modification_function(qi::QPoint,corner_index_l::Int64,d::AbstractDomainWithCorners)
-    foo(j) = ifelse(j==corner_index_l,one(ComplexF64),distance(qi,qpoint(d,j))/distance(qpoint(d,corner_index_l),qpoint(d,j)))
+    dist_ij(j) = distance(qi,qpoint(d,j))
+    dist_lj(j) = distance(qpoint(d,corner_index_l),qpoint(d,j))
+    foo(j) = ifelse(j==corner_index_l,one(ComplexF64),dist_ij(j)/dist_lj(j))
     return prod(foo(j) for j in corner_indices(d))
 end
-function corner_modification_function(r,corner_index_l,::DomainWith1Corner)
+function corner_modification_function(::QPoint,::Int64,::DomainWith1Corner)
     return one(ComplexF64)
 end
 function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
@@ -113,7 +115,7 @@ function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
         for i in 1:N  
             qi = qpoint(d,i)
             D[i,j] = -one(ComplexF64)
-            for l in edge_indices(d) # skip corner node
+            for l in edge_indices(d) # skip corner nodes
                 ql = qpoint(d,l)
                 ∂wl = wprime(ql)
                 H = double_layer_kernel_laplace_correction(qi,ql)
