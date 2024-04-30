@@ -4,11 +4,11 @@ using Plots
 const DF = DiffGrating1D
 
 k = 1.5
-N = 256
+N = 128
 p = 8
-#domain = DF.DomainSquare(k,N,p)
+domain = DF.DomainSquare(k,N,p)
 #domain = DF.Domain(DF._curve_square,k,N)
-domain = DF.DomainCosines(k,N,p)
+#domain = DF.DomainCosines(k,N,p)
 #domain = DF.Domain(DF._curve_cosines,k,N)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 

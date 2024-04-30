@@ -69,7 +69,9 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist)
         sarray = range(0,2π-2π/φN,φN)  # local parameter in [0,2π)
         for s in sarray
             w = _wfunc(s,p)
-            ∂w = _∂wfunc(s,p)
+            ∂w = _∂wfunc(s,p)*length(φlist)  # there's an extra factor of length(φlist)
+                                             # bc _wfunc is parametrized in [0,2π]
+                                             # but it should be in [0,2π/length(φlist)]
             # the first node derivative (the corner) is never used, set to NaN just in case
             if iszero(s)
                 ∂w = NaN

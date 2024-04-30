@@ -4,13 +4,16 @@ using Plots
 const DF = DiffGrating1D
 
 φ(t) = DF.curve_sharp_boomerang(t)
+#φ(t) = DF.curve_bean(t)
 
-N = 128
+N = 64
 p = 8
 Nhalf = N÷2
 k = 1.5
 #domain = DF.DomainWith1Corner(φ,k,N,p)
 domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
+#domain = DF.DomainSquare(k,N,p)
+#domain = DF.Domain(φ, k,N)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 
 sol(x) = DF.hankel0(k*norm(x-x0))

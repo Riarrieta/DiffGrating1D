@@ -38,7 +38,7 @@ sol_φ = [sol(DF.point(q)) for q in domain.quad]
 
 Dpot = DF.double_layer_potential(domain,sol_φ)
 Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
-sol_approx = -Dpot(y0)*4
+sol_approx = -Dpot(y0)
 error = abs((sol_y0-sol_approx)/sol_y0)
 
 ## interior test u = sin(kx)*sin(ky)
@@ -53,5 +53,5 @@ sol_φ = [sol(DF.point(q)) for q in domain.quad]
 
 Dpot = DF.double_layer_potential(domain,sol_φ)
 Spot = DF.single_layer_potential(domain,∂sol∂n_φ)
-sol_approx = Spot(y0)*4-Dpot(y0)*4
+sol_approx = Spot(y0)-Dpot(y0)
 error = abs((sol_y0-sol_approx)/sol_y0)
