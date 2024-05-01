@@ -11,5 +11,6 @@ include("quadrature.jl")
 include("domain_multiple_corners.jl")
 include("kernels.jl")
 include("matrix_discretization.jl")
+include("geometry.jl")
 
 end # module DiffGrating1D

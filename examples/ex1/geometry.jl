@@ -9,11 +9,13 @@ function geometry(;L=1)
     d = L
     d0 = d/2
     d1 = d/2
-    kB = k0*sqrt(ϵ1)
-    kA = k0*sqrt(ϵ2)
+    ktop = k0*sqrt(ϵ1)
+    kbottom = k0*sqrt(ϵ2)
+    Jmax = 15
 
-    kvec1 = kB*DF.Point2D(sin(θ),-cos(θ))
+    kvec1 = ktop*DF.Point2D(sin(θ),-cos(θ))
     @assert kvec1 ≈ k0*DF.Point2D(1/2,-sqrt(3)/2)
+    α0 = kvec1[1]
 
     c0 = DF.Point2D(0.0,0.0)
     c1 = DF.Point2D(L,0.0)
@@ -38,21 +40,22 @@ function geometry(;L=1)
     N8 = 40
 
     # lower domain
+    domA_boundary_labels = [:bottom,:right,:top,:left]
     domA = DF.DomainMultipleCorners(;φlist=[φ1,φ2,φ3,φ4],
-                                     k=kA,
+                                     k=kbottom,
                                      Nlist=[N1,N2,N3,N4],
                                      plist=[p,p,p,p],
-                                     counterclockwise=true)
+                                     counterclockwise=true,
+                                     φlabels=domA_boundary_labels)
     # upper domain
+    domB_boundary_labels = [:bottom,:left,:top,:right]
     domB = DF.DomainMultipleCorners(;φlist=[φ3,φ8,φ7,φ6],
-                                    k=kB,
+                                    k=ktop,
                                     Nlist=[N3,N8,N7,N6],
                                     plist=[p,p,p,p],
-                                    counterclockwise=false)
-    # check common interface (φ3) has the same nodes
-    domA_φ3_q = domA.quad[1+N1+N2 : N1+N2+N3]
-    domB_φ3_q = domB.quad[1 : N3]
-    @assert all(ai.x ≈ bi.x && ai.y ≈ bi.y for (ai,bi) in zip(domA_φ3_q,domB_φ3_q))
+                                    counterclockwise=false,
+                                    φlabels=domB_boundary_labels)
 
-    return domA,domB
+    geo = DF.Geometry([domA,domB],kbottom,ktop,L,α0,Jmax)
+    return geo
 end

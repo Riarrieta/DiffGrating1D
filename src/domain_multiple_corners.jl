@@ -19,6 +19,11 @@ corner_indices(d::DomainMultipleCorners) = d.corner_indices
 corners(d::DomainMultipleCorners) = (qpoint(d,i) for i in corner_indices(d))
 edge_indices(d::DomainMultipleCorners) = d.edge_indices
 edges(d::DomainMultipleCorners) = (qpoint(d,i) for i in edge_indices(d))
+boundary_indices(d::DomainMultipleCorners,label::Symbol) = d.boundary_labels[label]
+topboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:top]
+bottomboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:bottom]
+leftboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:left]
+rightboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:right]
 
 # graded mesh change of variable
 _ζfunc(s,si,sf) = (2*s-(si+sf))/(sf-si)
