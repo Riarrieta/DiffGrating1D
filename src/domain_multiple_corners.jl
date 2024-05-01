@@ -7,6 +7,10 @@ struct DomainMultipleCorners <: AbstractDomainWithCorners
     edge_indices::Vector{Int64}    # global indices of edges
     tarray       # global parametrization's parameter
     φlist        # list of parametrization
+    boundary_labels::Dict{Symbol,Vector{Int64}}  # boundary labels, 
+                                       # keys: :bottom,:right,:left,:top
+                                       # values: indices of qnodes that belong to :bottom, etc.,
+                                       # without including corners 
 end
 wavenumber(d::DomainMultipleCorners) = d.k
 nunknowns(d::DomainMultipleCorners) = 2*d.n
@@ -40,10 +44,11 @@ function _check_closed_curves(curves)
     !check && @info "" Tuple(φ1(2π)) Tuple(φ2(0.0)) norm(φ1(2π)-φ2(0.0))
     return check
 end
-function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true)
+function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlabels=nothing)
     @assert length(φlist) == length(Nlist) == length(plist)
     @assert _check_closed_curves(φlist)
     orientation = counterclockwise ? 1 : -1
+    φlabels_dict = isnothing(φlabels) ? [:nolabel for _ in φlist] : φlabels
     N = sum(Nlist)   # total number of nodes
     n = N ÷ 2
     tarray = range(0,2π-2π/N,N)    # global parameter in [0,2π)
@@ -52,17 +57,21 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true)
     # first qnode of each curve is a corner
     corners_indices = vcat([1],Nlist[1:end-1])
     corners_indices = cumsum(corners_indices)
+    # boundary labels
+    boundary_labels = Dict{Symbol,Vector{Int64}}()
     # construct grid
     quad = QPoint[]
     #ti = 0.0
     #tf = 2π
     #si_index = 1
     #sf_index = 1
-    for (φ,φN,p) in zip(φlist,Nlist,plist)
+    for (φ,φN,p,φlabel) in zip(φlist,Nlist,plist,φlabels_dict)
         @assert iseven(φN)
         @assert p ≥ 2
         φp_func(x)  = ForwardDiff.derivative(φ,x)       # first derivative
         φpp_func(x) = ForwardDiff.derivative(φp_func,x) # second derivative
+        # boundary label of the curve
+        label_idxs = get!(boundary_labels, φlabel, Int64[])
         # update si,sf
         #si_index = sf_index
         #sf_index += φN  # sf_index belongs to the next curve
@@ -73,9 +82,12 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true)
             ∂w = _∂wfunc(s,p)*length(φlist)  # there's an extra factor of length(φlist)
                                              # bc _wfunc is parametrized in [0,2π]
                                              # but it should be in [0,2π/length(φlist)]
-            # the first node derivative (the corner) is never used, set to NaN just in case
             if iszero(s)
+                # the first node derivative (the corner) is never used, set to NaN just in case
                 ∂w = NaN
+            else
+                # add edge variable global index to boundary label
+                !isnothing(φlabels) && push!(label_idxs,tindex)
             end
             x,y = φ(w)
             # tangent vector
@@ -99,25 +111,27 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true)
     @assert length(quad) == N
     @assert tindex == N+1
     edge_indices = setdiff(1:N,corners_indices)  # global indices of edges
-    return DomainMultipleCorners(n,k,quad,corners_indices,edge_indices,tarray,φlist)
+    return DomainMultipleCorners(n,k,quad,corners_indices,edge_indices,tarray,φlist,boundary_labels)
 end
 
 ## Common shapes
 function DomainSquare(k,N,p;counterclockwise=true)
     φlist,Nlist,plist = curves_square(N,p)
-    if !counterclockwise
+    φlabels = [:top,:left,:bottom,:right]
+    if !counterclockwise    
         φlist = _reverse_parametrizations(φlist)
         Nlist = Nlist[end:-1:1]
         plist = plist[end:-1:1]
     end
-    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise)
+    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise,φlabels)
 end
 function DomainCosines(k,N,p;counterclockwise=true)
     φlist,Nlist,plist = curves_cosines(N,p)
+    φlabels = [:top,:bottom]
     if !counterclockwise
         φlist = _reverse_parametrizations(φlist)
         Nlist = Nlist[end:-1:1]
         plist = plist[end:-1:1]
     end
-    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise)
+    return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise,φlabels)
 end
