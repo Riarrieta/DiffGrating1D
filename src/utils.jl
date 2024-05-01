@@ -68,6 +68,10 @@ end
 _reverse_parametrizations(φ) = t -> φ(2π-t)
 _reverse_parametrizations(φlist::AbstractVector) = [_reverse_parametrizations(φ) for φ in φlist[end:-1:1]]
 
+rel_error(approx,exact) = abs(approx-exact)/abs(exact)
+rel_error(approx::AbstractVector,exac::AbstractVector) = maximum(abs.(approx-exac))/maximum(abs.(exac))
+
+
 function _obtain_curve_parametrization(φ,trange)
     φp_func(t)  = ForwardDiff.derivative(φ,t)
     φpp_func(t) = ForwardDiff.derivative(φp_func,t)
