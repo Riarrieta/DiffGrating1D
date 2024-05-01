@@ -124,3 +124,36 @@ function DomainWith1Corner(φ,k,N,p;counterclockwise=true)
     @assert length(quad) == N
     return DomainWith1Corner(n,k,quad,tarray,φ)
 end
+
+## Plot recipe
+@recipe function plot_domain(d::AbstractDomain;tangent=true,normal=true)
+    curve_x = [q.x for q in d.quad]
+    curve_y = [q.y for q in d.quad]
+    φp_x = [q.tx for q in d.quad]
+    φp_y = [q.ty for q in d.quad]
+    normals_x = [q.nx for q in d.quad]
+    normals_y = [q.ny for q in d.quad]
+    xlabel --> "x"
+    yguide --> "y"
+    aspect_ratio --> :equal
+    seriestype --> :path
+    # tangent vectors
+    if tangent
+        @series begin
+            quiver := (φp_x,φp_y)
+            seriestype := :quiver
+            markershape := :none
+            curve_x,curve_y
+        end
+    end
+    # normal vectors
+    if normal
+        @series begin
+            quiver := (normals_x,normals_y)
+            seriestype := :quiver
+            markershape := :none
+            curve_x,curve_y
+        end
+    end
+    return curve_x,curve_y
+end

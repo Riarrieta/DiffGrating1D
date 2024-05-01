@@ -4,6 +4,7 @@ using LinearAlgebra
 using StaticArrays
 using SpecialFunctions
 using ForwardDiff
+using RecipesBase
 
 include("utils.jl")
 include("quadrature.jl")
