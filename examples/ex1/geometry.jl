@@ -11,7 +11,7 @@ function geometry(;L=1)
     d1 = d/2
     ktop = k0*sqrt(ϵ1)
     kbottom = k0*sqrt(ϵ2)
-    Jmax = 15
+    Jmax = 7
 
     kvec1 = ktop*DF.Point2D(sin(θ),-cos(θ))
     @assert kvec1 ≈ k0*DF.Point2D(1/2,-sqrt(3)/2)
