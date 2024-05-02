@@ -3,7 +3,7 @@ using DiffGrating1D
 using LinearAlgebra
 const DF = DiffGrating1D
 
-T0 = π   # period
+T0 = 1.5   # period
 J0 = 7  # maximum mode
 α0 = 0.3*π/T0 # Block wavenumber
 max_freq = J0/T0
@@ -42,3 +42,23 @@ Gmatrix = Fmatrix*diagm(bvec)*Tmatrix
 err_gmatrix = DF.rel_error(Gmatrix*fvec,gvec)
 Id_approx = Fmatrix*Tmatrix
 err_identity = DF.rel_error(Id_approx*fvec,fvec)
+
+## nonuniform mesh
+N = 40   # number of points
+p = 3
+srange = range(0,2π-2π/N,N)  # uniform parameter in [0,2π]
+wfunc(s) = T0/(2π)*DF._wfunc(s,p)
+∂wfunc(s) = DF.ForwardDiff.derivative((x) -> wfunc(x),s)
+xrange = wfunc.(srange)
+∂wlist = ∂wfunc.(srange)
+fvec = f.(xrange)
+
+# error t
+Tmatrix = [1/T0*2π/N*exp(-im*α(i)*xj)*∂wj for i in Jrange, (xj,∂wj) in zip(xrange,∂wlist)]
+err_tmatrix = DF.rel_error(Tmatrix*fvec,tvec)
+
+#error g
+gvec = g.(xrange)
+Fmatrix = [exp(im*α(j)*xi) for xi in xrange, j in Jrange]
+Gmatrix = Fmatrix*diagm(bvec)*Tmatrix
+err_gmatrix = DF.rel_error(Gmatrix*fvec,gvec)
