@@ -11,6 +11,11 @@ struct DomainMultipleCorners <: AbstractDomainWithCorners
                                        # keys: :bottom,:right,:left,:top
                                        # values: indices of qnodes that belong to :bottom, etc.,
                                        # without including corners 
+    reduced_boundary_labels::Dict{Symbol,Vector{Int64}}  # reducedboundary labels, 
+                                        # keys: :bottom,:right,:left,:top
+                                        # values: indices of qnodes, in the reduced NtD map,
+                                        # that belong to :bottom, etc.,
+                                        # without including corners 
 end
 wavenumber(d::DomainMultipleCorners) = d.k
 nunknowns(d::DomainMultipleCorners) = 2*d.n
@@ -21,6 +26,7 @@ corners(d::DomainMultipleCorners) = (qpoint(d,i) for i in corner_indices(d))
 edge_indices(d::DomainMultipleCorners) = d.edge_indices
 edges(d::DomainMultipleCorners) = (qpoint(d,i) for i in edge_indices(d))
 boundary_indices(d::DomainMultipleCorners,label::Symbol) = d.boundary_labels[label]
+reduced_boundary_indices(d::DomainMultipleCorners,label::Symbol) = d.reduced_boundary_labels[label]
 topboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:top]
 bottomboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:bottom]
 leftboundary_indices(d::DomainMultipleCorners) = d.boundary_labels[:left]
@@ -65,6 +71,8 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
     corners_indices = cumsum(corners_indices)
     # boundary labels
     boundary_labels = Dict{Symbol,Vector{Int64}}()
+    reduced_boundary_labels = Dict{Symbol,Vector{Int64}}()
+    reduced_label_counter = 1     # reduced ntd map index counter
     # construct grid
     quad = QPoint[]
     #ti = 0.0
@@ -78,6 +86,7 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
         φpp_func(x) = ForwardDiff.derivative(φp_func,x) # second derivative
         # boundary label of the curve
         label_idxs = get!(boundary_labels, φlabel, Int64[])
+        reduced_label_idxs = get!(reduced_boundary_labels, φlabel, Int64[])
         # update si,sf
         #si_index = sf_index
         #sf_index += φN  # sf_index belongs to the next curve
@@ -91,9 +100,12 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
             if iszero(s)
                 # the first node derivative (the corner) is never used, set to NaN just in case
                 ∂w = NaN
-            else
+            elseif !isnothing(φlabels)
                 # add edge variable global index to boundary label
-                !isnothing(φlabels) && push!(label_idxs,tindex)
+                push!(label_idxs,tindex)
+                # add idxs to reduced NtD idxs
+                push!(reduced_label_idxs,reduced_label_counter)
+                reduced_label_counter += 1
             end
             x,y = φ(w)
             # tangent vector
@@ -117,7 +129,7 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
     @assert length(quad) == N
     @assert tindex == N+1
     edge_indices = setdiff(1:N,corners_indices)  # global indices of edges
-    return DomainMultipleCorners(n,k,quad,corners_indices,edge_indices,tarray,φlist,boundary_labels)
+    return DomainMultipleCorners(n,k,quad,corners_indices,edge_indices,tarray,φlist,boundary_labels,reduced_boundary_labels)
 end
 
 ## Common shapes
