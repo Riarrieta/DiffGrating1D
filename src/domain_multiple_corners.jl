@@ -16,6 +16,7 @@ wavenumber(d::DomainMultipleCorners) = d.k
 nunknowns(d::DomainMultipleCorners) = 2*d.n
 qpoint(d::DomainMultipleCorners,i::Integer) = d.quad[i]
 corner_indices(d::DomainMultipleCorners) = d.corner_indices
+ncurves(d::DomainMultipleCorners) = length(corner_indices(d)) # number of (sub)curves = number of corners
 corners(d::DomainMultipleCorners) = (qpoint(d,i) for i in corner_indices(d))
 edge_indices(d::DomainMultipleCorners) = d.edge_indices
 edges(d::DomainMultipleCorners) = (qpoint(d,i) for i in edge_indices(d))

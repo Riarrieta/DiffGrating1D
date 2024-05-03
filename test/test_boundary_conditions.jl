@@ -3,7 +3,7 @@ using DiffGrating1D
 using LinearAlgebra
 const DF = DiffGrating1D
 
-T0 = 1.5   # period
+T0 = 1.0   # period
 J0 = 7  # maximum mode
 α0 = 0.3*π/T0 # Block wavenumber
 max_freq = J0/T0

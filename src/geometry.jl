@@ -49,9 +49,14 @@ function _assemble_T_G_matrices(domain::AbstractDomain,boundary_label::Symbol,β
     qpoints = (qpoint(domain,i) for i in boundary_indices(domain,boundary_label))
     xlist = (q.x for q in qpoints)
     ∂wlist = (wprime(q) for q in qpoints)
-    Δs = 2π/nunknowns(domain)   # spacing between qpoints in the (uniform) global s parameter
+    tnorm_vec = (tnorm(q) for q in qpoints)  # tangent vectors norm
+    T0 = 2π/ncurves(domain)   # length of period in (global) parameter space
+    # number of points in parameter space,
+    # since top/bottom boundaries are flat we have to add +1 for the corner
+    N = length(boundary_indices(domain,boundary_label))+1  
+    Δs = T0/N    # spacing in (global) parameter space
     # from grid to Fourier
-    Tmatrix = [Δs/L*exp(-im*αi*xj)*∂wj for αi in αlist, (xj,∂wj) in zip(xlist,∂wlist)]  
+    Tmatrix = [Δs/L*exp(-im*αi*xj)*tnj*∂wj for αi in αlist, (xj,∂wj,tnj) in zip(xlist,∂wlist,tnorm_vec)]  
     # from Fourier to grid
     Fmatrix = [exp(im*αj*xi) for xi in xlist, αj in αlist]
     # iB operator, grid to grid
