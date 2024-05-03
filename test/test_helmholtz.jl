@@ -4,11 +4,11 @@ using ForwardDiff
 using Plots
 const DF = DiffGrating1D
 
-φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
-
 N = 50
 k = 1.5
-domain = DF.Domain(φ,k,N)
+#φ(t) = DF.Point2D(cos(t)+0.65*cos(2*t)-0.65, 1.5*sin(t))
+#domain = DF.Domain(φ,k,N)
+domain = DF.DomainCosines(k,N,N,p)
 
 y0 = DF.Point2D(-0.1,0.3)      # interior eval point
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point

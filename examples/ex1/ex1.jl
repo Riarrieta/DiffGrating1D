@@ -12,5 +12,5 @@ plot(geo.domains[1],tangent=false,normal=false)
 plot!(geo.domains[2],tangent=false,normal=false)
 
 ##
-geo_test = geometry_test(;L=1,NN=102,Ncurve=100);
+geo_test = geometry_test(;L=1,NN=40,Ncurve=200);
 DF._check_ntd(geo_test,1e-4)

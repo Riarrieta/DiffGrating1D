@@ -12,7 +12,8 @@ Nhalf = N÷2
 k = 1.5
 #domain = DF.DomainWith1Corner(φ,k,N,p)
 #domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
-domain = DF.DomainSquare(k,N,p)
+#domain = DF.DomainSquare(k,N,p)
+domain = DF.DomainCosines(k,N,N,p)
 #domain = DF.Domain(φ, k,N)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 
@@ -20,11 +21,11 @@ sol(x) = DF.hankel0(k*norm(x-x0))
 sol_grad(x) = -k*DF.hankel1(k*norm(x-x0))*(x-x0)/norm(x-x0)
 ∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
-∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
+∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad];
 
 ## matrices
 Dmatrix = DF.double_layer_matrix_plus_identity(domain)
-Smatrix = DF.single_layer_matrix(domain)
+Smatrix = DF.single_layer_matrix(domain);
 
 ## Ntd map
 sol_φ_approx = Dmatrix \ (Smatrix*∂sol∂n_φ)

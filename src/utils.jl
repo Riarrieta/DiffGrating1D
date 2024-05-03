@@ -48,9 +48,12 @@ function _curve_square(t)
     end
 end
 function curves_cosines(N,p)
+    return curves_cosines(N,N,p)
+end
+function curves_cosines(N1,N2,p)
     φ1(t) = Point2D(1-t/π, cos(π/2*(1-t/π)))
     φ2(t) = Point2D(-1+t/π, -cos(π/2*(-1+t/π)))
-    Nlist = [N for _ in 1:2]
+    Nlist = [N1,N2]
     plist = [p for _ in 1:2]
     φlist = [φ1,φ2]
     return φlist,Nlist,plist

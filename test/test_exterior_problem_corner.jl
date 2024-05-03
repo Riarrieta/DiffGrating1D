@@ -7,11 +7,12 @@ const DF = DiffGrating1D
 #φ(t) = DF.curve_bean(t)
 
 k = 1.5
-N = 128
+N = 64
 p = 8
 #domain = DF.DomainWith1Corner(φ,k,N,p)
 #domain = DF.Domain(φ,k,N)
-domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
+#domain = DF.DomainMultipleCorners(;φlist=[φ],k,Nlist=[N],plist=[p])
+domain = DF.DomainCosines(k,N,N,p)
 x0 = DF.Point2D(5.0,-1.0)     # exterior eval point
 
 ## test kernels, N has to be large

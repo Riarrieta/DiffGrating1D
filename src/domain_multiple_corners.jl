@@ -85,9 +85,9 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
         sarray = range(0,2π-2π/φN,φN)  # local parameter in [0,2π)
         for s in sarray
             w = _wfunc(s,p)
-            ∂w = _∂wfunc(s,p)*length(φlist)  # there's an extra factor of length(φlist)
-                                             # bc _wfunc is parametrized in [0,2π]
-                                             # but it should be in [0,2π/length(φlist)]
+            ∂w = _∂wfunc(s,p)*(N/φN)  # there's an extra factor of (N/φN)
+                                      # bc _wfunc is parametrized in [0,2π]
+                                      # but it should be in [0,2π*φN/N]
             if iszero(s)
                 # the first node derivative (the corner) is never used, set to NaN just in case
                 ∂w = NaN
@@ -132,7 +132,10 @@ function DomainSquare(k,N,p;counterclockwise=true)
     return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise,φlabels)
 end
 function DomainCosines(k,N,p;counterclockwise=true)
-    φlist,Nlist,plist = curves_cosines(N,p)
+    return DomainCosines(k,N,N,p;counterclockwise=true)
+end
+function DomainCosines(k,N1,N2,p;counterclockwise=true)
+    φlist,Nlist,plist = curves_cosines(N1,N2,p)
     φlabels = [:top,:bottom]
     if !counterclockwise
         φlist = _reverse_parametrizations(φlist)
