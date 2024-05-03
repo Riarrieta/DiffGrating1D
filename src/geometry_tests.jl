@@ -79,7 +79,7 @@ function _check_ntd(domain::AbstractDomain,domain_idx,ϵtol)
     err_ntd_forward = rel_error(Dmatrix*sol_φ,Smatrix*∂sol∂n_φ)
     @info "NtD forward" domain_idx err_ntd_forward
 
-    #= ## try Schur complement to eliminate corner variables
+    ## try Schur complement to eliminate corner variables
     cv = corner_indices(domain)    # corner variables
     ev = edge_indices(domain)    # edge variables
     D1 = Dmatrix[cv,cv]
@@ -95,8 +95,8 @@ function _check_ntd(domain::AbstractDomain,domain_idx,ϵtol)
     sol_φ_edge_approx = D_D1 \ rhs2
     err_ntd_schur = rel_error(sol_φ_edge_approx,sol_φ[ev])
     @info "NtD Schur" domain_idx err_ntd_schur
-    check_ntd_schur = err_ntd_schur < ϵtol =#
-    return check_ntd #&& check_ntd_schur
+    check_ntd_schur = err_ntd_schur < ϵtol
+    return check_ntd && check_ntd_schur
 end
 function _check_ntd(geo::Geometry,ϵtol)
     check = true

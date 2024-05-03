@@ -60,6 +60,7 @@ function geometry(;L=1)
     return geo
 end
 
+# for testing purposes
 function geometry_test(;L=1,NN,Ncurve)
     ϵ1 = 1
     ϵ2 = 2.25
