@@ -71,8 +71,7 @@ end
 _reverse_parametrizations(φ) = t -> φ(2π-t)
 _reverse_parametrizations(φlist::AbstractVector) = [_reverse_parametrizations(φ) for φ in φlist[end:-1:1]]
 
-rel_error(approx,exact) = abs(approx-exact)/abs(exact)
-rel_error(approx::AbstractVector,exac::AbstractVector) = maximum(abs.(approx-exac))/maximum(abs.(exac))
+rel_error(approx,exact;p=Inf) = norm(approx-exact,p)/norm(exact,p)
 
 
 function _obtain_curve_parametrization(φ,trange)

@@ -4,7 +4,7 @@ using LinearAlgebra
 const DF = DiffGrating1D
 include("geometry.jl")
 
-geo = geometry();
+geo = _simple_geometry();
 #DF.check_geometry(geo;ϵtol=1e-4)
 DF._check_ntd(geo,1e-4)
 
@@ -15,8 +15,8 @@ k = domain.k
 β = sqrt(Complex(k^2-α0^2))
 γ = exp(im*geo.α0*geo.L)
 
-sol(x) = exp(im*(α0*x[1] + β*x[2]))
-sol_grad(x) = DF.Point2D(im*α0,im*β)*sol(x)
+sol(x) = exp(im*(α0*x[1] - β*x[2]))
+sol_grad(x) = DF.Point2D(im*α0,-im*β)*sol(x)
 ∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_φ = [sol(DF.point(q)) for q in domain.quad]
 ∂sol∂n_φ = [∂sol∂n(DF.point(q),DF.normal(q)) for q in domain.quad]
@@ -40,7 +40,7 @@ err_ntd_schur = DF.rel_error(sol_φ_edge_approx,reduced_sol_φ)
 ## try reduced indexing
 bottom_idx = DF.reduced_boundary_indices(domain,:bottom)
 left_idx = DF.reduced_boundary_indices(domain,:left)
-right_idx = DF.reduced_boundary_indices(domain,:right) |> reverse
+right_idx = DF.reduced_boundary_indices(domain,:right) |> reverse  # REVERSED
 top_idx = DF.reduced_boundary_indices(domain,:top)
 @assert length(ev) == length(bottom_idx)+length(left_idx)+length(right_idx)+length(top_idx)
 
@@ -109,6 +109,63 @@ N_assemble = [N11 N12;
 u_border = vcat(ubottom,utop)
 ∂u_border = vcat(∂ubottom,∂utop)
 
-norm(N_assemble*∂u_border-u_border)
+err_n = DF.rel_error(N_assemble*∂u_border,u_border)
+err_n_inv = DF.rel_error(N_assemble \ u_border,∂u_border)  # doesn't work
 
-## test Q and D matrices
+## test Q and Y matrices
+# initial conditions
+Q = -geo.Gbottom*(-1)     # REVERSE SIGN!!
+Y = I(size(Q,1))
+γ = exp(im*geo.α0*geo.L)
+# generate data
+topdom = DF.topdomain(geo)
+bottomdom = DF.bottomdomain(geo)
+top_qpoints = (DF.qpoint(topdom,i) for i in DF.topboundary_indices(topdom))
+bottom_qpoints = (DF.qpoint(bottomdom,i) for i in DF.bottomboundary_indices(bottomdom))
+
+u_top = [sol(DF.point(q)) for q in top_qpoints]
+∂u_top = [∂sol∂n(DF.point(q),DF.normal(q)) for q in top_qpoints]
+u_bottom = [sol(DF.point(q)) for q in bottom_qpoints]
+∂u_bottom = [∂sol∂n(DF.point(q),DF.normal(q)) for q in bottom_qpoints]
+
+# check 
+err_q0 = DF.rel_error(Q*u_bottom,∂u_bottom)
+err_q0_inv = DF.rel_error(Q \ ∂u_bottom,u_bottom) # doesn't work
+
+# check 2
+err_n1 = DF.rel_error(N11*∂u_bottom+N12*∂u_top,u_bottom)
+err_n2 = DF.rel_error(N21*∂u_bottom+N22*∂u_top,u_top)
+
+# iterate
+Z = (I-N11*Q) \ N12
+u_bottom_apprx = Z*∂u_top
+err_z = DF.rel_error(u_bottom_apprx,u_bottom)
+
+err_eq2 = DF.rel_error(N21*Q*u_bottom_apprx+N22*∂u_top,u_top)
+eq2_matrix = N21*Q*Z+N22
+err_eq2_inv = DF.rel_error(eq2_matrix \ u_top,∂u_top)  # doesn't work
+
+Qtop_inv = N22+N21*Q*Z
+Qtop = inv(Qtop_inv)
+Ytop = Y*Z*Qtop
+
+# solve 
+err_qinv = DF.rel_error(Qtop_inv*∂u_top,u_top)
+err_q_gauss = DF.rel_error(Qtop_inv \ u_top,∂u_top) # doesn't work
+err_q = DF.rel_error(Qtop*u_top,∂u_top) # doesn't work
+err_y = DF.rel_error(Ytop*u_top,u_bottom) # works!
+
+## solve for bottom
+u_bottom_apprx_1 = Ytop*u_top
+err_y_1 = DF.rel_error(u_bottom_apprx_1,u_bottom) # works! true equation
+
+u_bottom_apprx_2 = Y*Z*∂u_top
+err_y_2 = DF.rel_error(u_bottom_apprx_2,u_bottom) # works!
+
+∂u_top_apprx = Qtop*u_top
+err_∂u_top_apprx = DF.rel_error(∂u_top_apprx,∂u_top)
+err_∂u_top_apprx_vec = abs.(∂u_top_apprx-∂u_top)/maximum(abs.(∂u_top))
+u_bottom_apprx_3 = Y*Z*∂u_top_apprx
+err_y_2 = DF.rel_error(u_bottom_apprx_3,u_bottom)
+
+

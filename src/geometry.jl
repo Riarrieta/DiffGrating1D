@@ -17,6 +17,7 @@ struct Geometry
 end
 bottomdomain(g::Geometry) = g.domains[1]
 topdomain(g::Geometry) = g.domains[end]
+γfactor(g::Geometry) = exp(im*g.α0*g.L)
 
 function _assemble_T_G_matrices(domain::AbstractDomain,boundary_label::Symbol,βvec,αlist,L)
     qpoints = (qpoint(domain,i) for i in boundary_indices(domain,boundary_label))

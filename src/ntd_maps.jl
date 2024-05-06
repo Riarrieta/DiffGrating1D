@@ -1,9 +1,5 @@
 
-function obtain_ntd_matrices(domain::AbstractDomain)
-    ## matrices
-    Dmatrix = double_layer_matrix_plus_identity(domain)
-    Smatrix = single_layer_matrix(domain)
-
+function obtain_ntd_matrices(Dmatrix,Smatrix,domain::AbstractDomain)
     cv = corner_indices(domain)    # corner variables
     ev = edge_indices(domain)    # edge variables
     D1 = Dmatrix[cv,cv]
@@ -16,6 +12,12 @@ function obtain_ntd_matrices(domain::AbstractDomain)
     D_D1 = (D4-D3*(D1\D2))  # Schur complement of D1
     rhsmatrix = (S4-D3*(D1\S2))
     return D_D1,rhsmatrix
+end
+function obtain_ntd_matrices(domain::AbstractDomain)
+    ## matrices
+    Dmatrix = double_layer_matrix_plus_identity(domain)
+    Smatrix = single_layer_matrix(domain)
+    return obtain_ntd_matrices(Dmatrix,Smatrix,domain)
 end
 function obtain_ntd_map(domain::AbstractDomain)
     D_D1,rhsmatrix = obtain_ntd_matrices(domain::AbstractDomain)
