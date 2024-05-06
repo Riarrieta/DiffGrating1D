@@ -41,7 +41,7 @@ err_ntd_schur = DF.rel_error(sol_φ_edge_approx,reduced_sol_φ)
 bottom_idx = DF.reduced_boundary_indices(domain,:bottom)
 left_idx = DF.reduced_boundary_indices(domain,:left)
 right_idx = DF.reduced_boundary_indices(domain,:right) |> reverse
-top_idx = DF.reduced_boundary_indices(domain,:top) |> reverse
+top_idx = DF.reduced_boundary_indices(domain,:top)
 @assert length(ev) == length(bottom_idx)+length(left_idx)+length(right_idx)+length(top_idx)
 
 # check Bloch boundary conditions
@@ -110,3 +110,5 @@ u_border = vcat(ubottom,utop)
 ∂u_border = vcat(∂ubottom,∂utop)
 
 norm(N_assemble*∂u_border-u_border)
+
+## test Q and D matrices
