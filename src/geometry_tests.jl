@@ -12,7 +12,8 @@ end
 function _check_common_nodes(bottom_domain,top_domain)
     bottom_domain_top_nodes = (qpoint(bottom_domain,i) for i in boundary_indices(bottom_domain,:top))
     top_domain_bottom_nodes = (qpoint(top_domain,i) for i in boundary_indices(top_domain,:bottom))
-    check = all(b.x ≈ t.x && b.y ≈ t.y for (b,t) in zip(bottom_domain_top_nodes,top_domain_bottom_nodes))
+    check_foo(q1,q2) = q1.x≈q2.x && q1.y≈q2.y && rdot(normal(q1),normal(q2))≈-1  # same points, opposite normals
+    check = all(check_foo(b,t) for (b,t) in zip(bottom_domain_top_nodes,top_domain_bottom_nodes))
     return check
 end
 function _check_common_nodes(domains)
@@ -56,13 +57,17 @@ function _check_T_G_matrices(geo::Geometry,ϵtol)
 end
 
 # tests NtD maps
-function _check_ntd(domain::AbstractDomain,domain_idx,ϵtol)
+function _check_ntd(domain::AbstractDomain,domain_idx,α0,γ,ϵtol)
     k = wavenumber(domain)
-    x0 = Point2D(-5.0,-1.0)     # exterior eval point
-    sol(x) = hankel0(k*norm(x-x0))
-    sol_grad(x) = -k*hankel1(k*norm(x-x0))*(x-x0)/norm(x-x0)
-    #sol(x) = cos(k*x[1])
+    β = sqrt(Complex(k^2-α0^2))
+    #x0 = Point2D(-5.0,-1.0)     # exterior eval point
+    #sol(x) = hankel0(k*norm(x-x0))
+    #sol_grad(x) = -k*hankel1(k*norm(x-x0))*(x-x0)/norm(x-x0)
+    #w = k/sqrt(2)
+    #sol(x) = cos(w*x[1])*cos(w*x[2])
     #sol_grad(x) = ForwardDiff.gradient(sol,x)
+    sol(x) = exp(im*(α0*x[1] + β*x[2]))
+    sol_grad(x) = Point2D(im*α0,im*β)*sol(x)
     ∂sol∂n(x,n) = rdot(sol_grad(x),n)
     sol_φ = [sol(point(q)) for q in domain.quad]
     ∂sol∂n_φ = [∂sol∂n(point(q),normal(q)) for q in domain.quad]
@@ -80,36 +85,42 @@ function _check_ntd(domain::AbstractDomain,domain_idx,ϵtol)
     @info "NtD forward" domain_idx err_ntd_forward
 
     ## try Schur complement to eliminate corner variables
-    cv = corner_indices(domain)    # corner variables
+    D_D1,rhsmatrix = obtain_ntd_matrices(Dmatrix,Smatrix,domain)
     ev = edge_indices(domain)    # edge variables
-    D1 = Dmatrix[cv,cv]
-    D2 = Dmatrix[cv,ev]
-    D3 = Dmatrix[ev,cv]
-    D4 = Dmatrix[ev,ev]
-    S2 = Smatrix[cv,ev]
-    S4 = Smatrix[ev,ev]
-
-    D_D1 = (D4-D3*(D1\D2))  # Schur complement of D1
-    rhsmatrix = (S4-D3*(D1\S2))
     rhs2 = rhsmatrix*∂sol∂n_φ[ev]
     sol_φ_edge_approx = D_D1 \ rhs2
     err_ntd_schur = rel_error(sol_φ_edge_approx,sol_φ[ev])
     @info "NtD Schur" domain_idx err_ntd_schur
     check_ntd_schur = err_ntd_schur < ϵtol
+    #_check_ntd_N_matrices(domain,domain_idx,sol_φ,∂sol∂n_φ,γ,ϵtol)
     return check_ntd && check_ntd_schur
 end
 function _check_ntd(geo::Geometry,ϵtol)
+    α0 = geo.α0
+    γ = γfactor(geo)
     check = true
     for (i,domain) in enumerate(geo.domains)
-        check &= _check_ntd(domain,i,ϵtol)
+        check &= _check_ntd(domain,i,α0,γ,ϵtol)
     end
     return check
 end
 
+function _check_ntd_N_matrices(domain::AbstractDomain,domain_idx,sol_φ,∂sol∂n_φ,γ,ϵtol)
+    N11,N12,N21,N22 = obtain_reduced_ntd_map(domain,γ)
+    u_bottom = sol_φ[bottomboundary_indices(domain)]
+    u_top = sol_φ[topboundary_indices(domain)]
+    ∂u_bottom = ∂sol∂n_φ[bottomboundary_indices(domain)]
+    ∂u_top = ∂sol∂n_φ[topboundary_indices(domain)]
+    u_bottom_approx = N11*∂u_bottom + N12*∂u_top
+    u_top_approx = N21*∂u_bottom + N22*∂u_top
+    @info "" domain_idx rel_error(u_bottom_approx,u_bottom)
+    @info "" domain_idx rel_error(u_top_approx,u_top)
+end
+
 function check_geometry(geo::Geometry;ϵtol=1e-4)
     # check top and bottom domains have flat boundaries 
-    check_boundary = _check_flat_boundary(topdomain(geo),:top,geo.L)
-    check_flat = _check_flat_boundary(bottomdomain(geo),:bottom,geo.L)
+    check_flat_top = _check_flat_boundary(topdomain(geo),:top,geo.L)
+    check_flat_bottom = _check_flat_boundary(bottomdomain(geo),:bottom,geo.L)
     # check that domains have common boundaries
     check_common = _check_common_nodes(geo.domains)
     # check matrices
@@ -117,7 +128,7 @@ function check_geometry(geo::Geometry;ϵtol=1e-4)
     # check NtD 
     check_ntd = _check_ntd(geo,ϵtol)
     # check total
-    check_total = check_boundary && check_flat && check_common && check_matrices && check_ntd
-    @info "Geometry tests" check_boundary check_flat check_common check_matrices check_ntd check_total
+    check_total = check_flat_top && check_flat_bottom && check_common && check_matrices && check_ntd
+    @info "Geometry tests" check_flat_top check_flat_bottom check_common check_matrices check_ntd check_total
     return check_total
 end

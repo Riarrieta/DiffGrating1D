@@ -6,7 +6,6 @@ include("geometry.jl")
 
 geo = _simple_geometry();
 #DF.check_geometry(geo;ϵtol=1e-4)
-DF._check_ntd(geo,1e-4)
 
 ## NTD maps
 domain = geo.domains[1]
@@ -110,7 +109,7 @@ u_border = vcat(ubottom,utop)
 ∂u_border = vcat(∂ubottom,∂utop)
 
 err_n = DF.rel_error(N_assemble*∂u_border,u_border)
-err_n_inv = DF.rel_error(N_assemble \ u_border,∂u_border)  # doesn't work
+#err_n_inv = DF.rel_error(N_assemble \ u_border,∂u_border)  # doesn't work, ill-conditioned
 
 ## test Q and Y matrices
 # initial conditions
@@ -118,10 +117,8 @@ Q = -geo.Gbottom*(-1)     # REVERSE SIGN!!
 Y = I(size(Q,1))
 γ = exp(im*geo.α0*geo.L)
 # generate data
-topdom = DF.topdomain(geo)
-bottomdom = DF.bottomdomain(geo)
-top_qpoints = (DF.qpoint(topdom,i) for i in DF.topboundary_indices(topdom))
-bottom_qpoints = (DF.qpoint(bottomdom,i) for i in DF.bottomboundary_indices(bottomdom))
+top_qpoints = (DF.qpoint(domain,i) for i in DF.topboundary_indices(domain))
+bottom_qpoints = (DF.qpoint(domain,i) for i in DF.bottomboundary_indices(domain))
 
 u_top = [sol(DF.point(q)) for q in top_qpoints]
 ∂u_top = [∂sol∂n(DF.point(q),DF.normal(q)) for q in top_qpoints]
@@ -130,7 +127,7 @@ u_bottom = [sol(DF.point(q)) for q in bottom_qpoints]
 
 # check 
 err_q0 = DF.rel_error(Q*u_bottom,∂u_bottom)
-err_q0_inv = DF.rel_error(Q \ ∂u_bottom,u_bottom) # doesn't work
+err_q0_inv = DF.rel_error(Q\∂u_bottom,u_bottom) # doesn't work, ill-conditioned
 
 # check 2
 err_n1 = DF.rel_error(N11*∂u_bottom+N12*∂u_top,u_bottom)
@@ -143,7 +140,7 @@ err_z = DF.rel_error(u_bottom_apprx,u_bottom)
 
 err_eq2 = DF.rel_error(N21*Q*u_bottom_apprx+N22*∂u_top,u_top)
 eq2_matrix = N21*Q*Z+N22
-err_eq2_inv = DF.rel_error(eq2_matrix \ u_top,∂u_top)  # doesn't work
+err_eq2_inv = DF.rel_error(eq2_matrix\u_top,∂u_top)  # doesn't work, ill-conditioned
 
 Qtop_inv = N22+N21*Q*Z
 Qtop = inv(Qtop_inv)
@@ -151,8 +148,7 @@ Ytop = Y*Z*Qtop
 
 # solve 
 err_qinv = DF.rel_error(Qtop_inv*∂u_top,u_top)
-err_q_gauss = DF.rel_error(Qtop_inv \ u_top,∂u_top) # doesn't work
-err_q = DF.rel_error(Qtop*u_top,∂u_top) # doesn't work
+err_q = DF.rel_error(Qtop*u_top,∂u_top) # doesn't work, ill-conditioned
 err_y = DF.rel_error(Ytop*u_top,u_bottom) # works!
 
 ## solve for bottom

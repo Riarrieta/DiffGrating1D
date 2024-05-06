@@ -170,6 +170,15 @@ function _simple_geometry(;L=1)
                                      plist=[p,p,p,p],
                                      counterclockwise=true,
                                      φlabels=domA_boundary_labels)
-    geo = DF.Geometry([domA],kbottom,ktop,L,α0,Jmax)
+    # upper domain
+    domB_boundary_labels = [:bottom,:left,:top,:right]
+    domB = DF.DomainMultipleCorners(;φlist=[φ3,φ8,φ7,φ6],
+                                    k=ktop,
+                                    Nlist=[N3,N8,N7,N6],
+                                    plist=[p,p,p,p],
+                                    counterclockwise=false,
+                                    φlabels=domB_boundary_labels)
+
+    geo = DF.Geometry([domA,domB],kbottom,ktop,L,α0,Jmax)
     return geo
 end
