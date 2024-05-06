@@ -40,8 +40,8 @@ err_ntd_schur = DF.rel_error(sol_φ_edge_approx,reduced_sol_φ)
 ## try reduced indexing
 bottom_idx = DF.reduced_boundary_indices(domain,:bottom)
 left_idx = DF.reduced_boundary_indices(domain,:left)
-right_idx = DF.reduced_boundary_indices(domain,:right)
-top_idx = DF.reduced_boundary_indices(domain,:top)
+right_idx = DF.reduced_boundary_indices(domain,:right) |> reverse
+top_idx = DF.reduced_boundary_indices(domain,:top) |> reverse
 @assert length(ev) == length(bottom_idx)+length(left_idx)+length(right_idx)+length(top_idx)
 
 # check Bloch boundary conditions
@@ -83,15 +83,19 @@ V_assemble = [V11 V12 V13 V14;
 u_assemble = vcat(ubottom,v,w,utop)
 ∂u_assemble = vcat(∂ubottom,∂v,∂w,∂utop)
 
-norm(V*reduced_∂sol∂n_φ-reduced_sol_φ)
-norm(V_assemble*∂u_assemble-u_assemble)
+norm_v1 = norm(V*reduced_∂sol∂n_φ-reduced_sol_φ)
+norm_v2 = norm(V_assemble*∂u_assemble-u_assemble)
 
 ## test N matrices
+_V13 = -V13
+_V23 = -V23
+_V33 = -V33
+_V43 = -V43
 # C matrices
-C1 = V12 + γ*V13
-C2 = V42 + γ*V43
+C1 = V12 + γ*_V13
+C2 = V42 + γ*_V43
 # D matrices
-D0 = γ*V22 + γ^2*V23 - V32 - γ*V33
+D0 = γ*V22 + γ^2*_V23 - V32 - γ*_V33
 D1 = D0 \ (V31-γ*V21)
 D2 = D0 \ (V34-γ*V24)
 # N matrices
@@ -105,4 +109,4 @@ N_assemble = [N11 N12;
 u_border = vcat(ubottom,utop)
 ∂u_border = vcat(∂ubottom,∂utop)
 
-N_assemble*∂u_border-u_border
+norm(N_assemble*∂u_border-u_border)
