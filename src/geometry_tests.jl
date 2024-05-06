@@ -92,8 +92,13 @@ function _check_ntd(domain::AbstractDomain,domain_idx,α0,γ,ϵtol)
     err_ntd_schur = rel_error(sol_φ_edge_approx,sol_φ[ev])
     @info "NtD Schur" domain_idx err_ntd_schur
     check_ntd_schur = err_ntd_schur < ϵtol
-    #_check_ntd_N_matrices(domain,domain_idx,sol_φ,∂sol∂n_φ,γ,ϵtol)
-    return check_ntd && check_ntd_schur
+
+    ## check N matrices
+    err_n = _check_ntd_N_matrices(domain,sol_φ,∂sol∂n_φ,γ)
+    @info "N matrices" domain_idx err_n
+    check_n_matrices = err_n < ϵtol
+
+    return check_ntd && check_ntd_schur && check_n_matrices
 end
 function _check_ntd(geo::Geometry,ϵtol)
     α0 = geo.α0
@@ -105,7 +110,7 @@ function _check_ntd(geo::Geometry,ϵtol)
     return check
 end
 
-function _check_ntd_N_matrices(domain::AbstractDomain,domain_idx,sol_φ,∂sol∂n_φ,γ,ϵtol)
+function _check_ntd_N_matrices(domain::AbstractDomain,sol_φ,∂sol∂n_φ,γ)
     N11,N12,N21,N22 = obtain_reduced_ntd_map(domain,γ)
     u_bottom = sol_φ[bottomboundary_indices(domain)]
     u_top = sol_φ[topboundary_indices(domain)]
@@ -113,8 +118,8 @@ function _check_ntd_N_matrices(domain::AbstractDomain,domain_idx,sol_φ,∂sol�
     ∂u_top = ∂sol∂n_φ[topboundary_indices(domain)]
     u_bottom_approx = N11*∂u_bottom + N12*∂u_top
     u_top_approx = N21*∂u_bottom + N22*∂u_top
-    @info "" domain_idx rel_error(u_bottom_approx,u_bottom)
-    @info "" domain_idx rel_error(u_top_approx,u_top)
+    err_n = max(rel_error(u_bottom_approx,u_bottom),rel_error(u_top_approx,u_top))
+    return err_n
 end
 
 function check_geometry(geo::Geometry;ϵtol=1e-4)
