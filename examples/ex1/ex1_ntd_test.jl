@@ -51,8 +51,8 @@ ubottom = reduced_sol_φ[bottom_idx]
 ∂ubottom = reduced_∂sol∂n_φ[bottom_idx]
 v = reduced_sol_φ[left_idx]
 ∂v = reduced_∂sol∂n_φ[left_idx]
-w = reduced_sol_φ[reverse(right_idx)]   #[right_idx]
-∂w = reduced_∂sol∂n_φ[reverse(right_idx)]
+w = reduced_sol_φ[(right_idx)]   #[right_idx]
+∂w = reduced_∂sol∂n_φ[(right_idx)]
 norm_1 = norm(v*γ - w)
 norm_2 = norm(∂v*γ + ∂w)
 
@@ -84,4 +84,25 @@ u_assemble = vcat(ubottom,v,w,utop)
 ∂u_assemble = vcat(∂ubottom,∂v,∂w,∂utop)
 
 norm(V*reduced_∂sol∂n_φ-reduced_sol_φ)
-V_assemble*∂u_assemble-u_assemble
+norm(V_assemble*∂u_assemble-u_assemble)
+
+## test N matrices
+# C matrices
+C1 = V12 + γ*V13
+C2 = V42 + γ*V43
+# D matrices
+D0 = γ*V22 + γ^2*V23 - V32 - γ*V33
+D1 = D0 \ (V31-γ*V21)
+D2 = D0 \ (V34-γ*V24)
+# N matrices
+N11 = V11 + C1*D1
+N12 = V14 + C1*D2
+N21 = V41 + C2*D1
+N22 = V44 + C2*D2
+
+N_assemble = [N11 N12;
+              N21 N22]
+u_border = vcat(ubottom,utop)
+∂u_border = vcat(∂ubottom,∂utop)
+
+N_assemble*∂u_border-u_border
