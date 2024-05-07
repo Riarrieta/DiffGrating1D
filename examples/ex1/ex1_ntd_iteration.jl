@@ -12,6 +12,7 @@ domain = geo.domains[1]
 k = domain.k
 α0 = geo.α0
 β = sqrt(Complex(k^2-α0^2))
+@assert β == geo.βtop[geo.Jmax+1]
 γ = exp(im*geo.α0*geo.L)
 
 sol(x) = exp(im*(α0*x[1] - β*x[2]))
@@ -61,3 +62,24 @@ utop_apprx = Lmatrix\rhs
 
 err_top = DF.rel_error(utop_apprx,u_incident)   # works!!!!
 #err_top_forward = Lmatrix*u_incident-rhs
+
+## obtain reflection and transmission coeff.
+u_reflected = utop_apprx-u_incident
+u_transmitted = Ytoptop*utop_apprx
+
+# Fourier coefficients
+r_coeff = geo.Ttop*u_reflected   # works!
+t_coeff = geo.Tbottom*u_transmitted  # works!
+
+## test 'solve_diffraction_problem'
+u_reflected0,r_coeff0,u_transmitted0,t_coeff0 = DF.solve_diffraction_problem(geo);
+
+# error vs by-hand
+u_reflected0 ≈ u_reflected
+r_coeff0 ≈ r_coeff
+u_transmitted0 ≈ u_transmitted
+t_coeff0 ≈ t_coeff
+
+# error vs true
+norm(u_reflected0,Inf)
+DF.rel_error(u_transmitted0,u_bottom)

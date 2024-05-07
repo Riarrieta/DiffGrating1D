@@ -80,6 +80,31 @@ end
 
 function solve_diffraction_problem(geo::Geometry)
     # initial conditions
-    Q = -geo.Gbottom
-    Y = 4
+    γ = γfactor(geo)
+    α0,β0 = αβfactors(geo)
+    Q = -geo.Gbottom  # -iB^(2)
+    Y = I(size(Q,1))
+    # iterate
+    for dom in geo.domains  # from bottom to top
+        # multiply by -1, since the normals of adyacent domains point in opposite directions
+        rmul!(Q,-one(ComplexF64))  
+        # obtain Q and Y from Domain
+        Q,Y = obtain_Q_Y_matrices(dom,γ,Q,Y)
+    end
+    # solve top boundary
+    topdom = topdomain(geo)
+    top_points = (point(qpoint(topdom,i)) for i in topboundary_indices(topdom))
+    u_inc(x) = exp(im*(α0*x[1]-β0*x[2]))   # incident planewave
+    u_incident = [u_inc(x) for x in top_points]   
+    β0 = geo.βtop[geo.Jmax+1]      # β of incident planewave
+    rhs = [-2*im*β0*u for u in u_incident]
+    Lmatrix = Q-geo.Gtop  # Q-iB^(1)
+    # solve and get fields
+    utop = Lmatrix\rhs
+    u_reflected = utop-u_incident
+    u_transmitted = Y*utop
+    # get reflection and transmission coeff
+    r_coeff = geo.Ttop*u_reflected
+    t_coeff = geo.Tbottom*u_transmitted
+    return u_reflected,r_coeff,u_transmitted,t_coeff
 end
