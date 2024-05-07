@@ -4,7 +4,7 @@ using LinearAlgebra
 const DF = DiffGrating1D
 include("geometry.jl")
 
-geo = _simple_geometry();
+geo = geometry(;homogeneous=true);
 #DF.check_geometry(geo;ϵtol=1e-4)
 
 ## NTD maps
@@ -83,3 +83,6 @@ t_coeff0 ≈ t_coeff
 # error vs true
 norm(u_reflected0,Inf)
 DF.rel_error(u_transmitted0,u_bottom)
+
+##
+DF.check_homogeneous_geometry(geo;ϵtol=1e-4)

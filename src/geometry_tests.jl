@@ -137,3 +137,32 @@ function check_geometry(geo::Geometry;ϵtol=1e-4)
     @info "Geometry tests" check_flat_top check_flat_bottom check_common check_matrices check_ntd check_total
     return check_total
 end
+
+function _is_homogeneous(geo::Geometry)
+    k = geo.kbottom
+    for dom in geo.domains
+        wavenumber(dom)≠k && return false
+    end
+    return true
+end
+function check_homogeneous_geometry(geo::Geometry;ϵtol=1e-4)
+    @assert _is_homogeneous(geo) "Geometry is not homogeneous"
+    # solve 'homogeneous' diffraction problem and compare with true solution
+    u_reflected,r_coeff,u_transmitted,t_coeff = solve_diffraction_problem(geo);
+    # true solution
+    topdom = topdomain(geo)
+    bottomdom = bottomdomain(geo)
+    bottom_points = (point(qpoint(bottomdom,i)) for i in bottomboundary_indices(bottomdom))
+    α0,β0 = αβfactors(geo)
+    u_inc(x) = exp(im*(α0*x[1]-β0*x[2]))   # incident planewave
+    u_transmitted_true = [u_inc(x) for x in bottom_points]   
+    t_coeff_true = zeros(size(t_coeff)); t_coeff_true[geo.Jmax+1]=1;  # only zeroth order transmits
+    # compare
+    err_reflected = norm(u_reflected,Inf)   # should go to zero
+    err_r_coeff = norm(r_coeff,Inf)   # should go to zero
+    err_transmitted = rel_error(u_transmitted,u_transmitted_true)
+    err_t_coeff = rel_error(t_coeff,t_coeff_true)
+    check_hom = err_reflected<ϵtol && err_r_coeff<ϵtol && err_transmitted<ϵtol && err_t_coeff<ϵtol
+    @info "Homogeneous Geometry tests" err_reflected err_r_coeff err_transmitted err_t_coeff check_hom
+    return check_hom
+end

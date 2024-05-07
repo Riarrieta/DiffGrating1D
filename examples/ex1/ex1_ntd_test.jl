@@ -4,7 +4,7 @@ using LinearAlgebra
 const DF = DiffGrating1D
 include("geometry.jl")
 
-geo = _simple_geometry();
+geo = geometry(;homogeneous=true);
 #DF.check_geometry(geo;ϵtol=1e-4)
 
 ## NTD maps
