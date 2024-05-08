@@ -61,14 +61,14 @@ function geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=false)
 
     N1 = 60
     N2 = 40
-    N3 = 150
-    N4 = 150
+    N3 = 160
+    N4 = 160
     N5 = 40
 
-    N6 = 40
+    N6 = 140
     N7 = 160
     N8 = 160
-    N9 = 40
+    N9 = 140
 
     N10 = 150
     N11 = 60

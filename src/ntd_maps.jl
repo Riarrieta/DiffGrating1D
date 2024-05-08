@@ -85,12 +85,14 @@ function solve_diffraction_problem(geo::Geometry)
     Q = -geo.Gbottom  # -iB^(2)
     Y = I(size(Q,1))
     # iterate
-    for dom in geo.domains  # from bottom to top
+    for (i,dom) in enumerate(geo.domains) # from bottom to top
+        @info "Solving Domain $i"
         # multiply by -1, since the normals of adyacent domains point in opposite directions
         rmul!(Q,-one(ComplexF64))  
         # obtain Q and Y from Domain
         Q,Y = obtain_Q_Y_matrices(dom,γ,Q,Y)
     end
+    @info "Solving Top Domain"
     # solve top boundary
     topdom = topdomain(geo)
     top_points = (point(qpoint(topdom,i)) for i in topboundary_indices(topdom))
@@ -106,5 +108,6 @@ function solve_diffraction_problem(geo::Geometry)
     # get reflection and transmission coeff
     r_coeff = geo.Ttop*u_reflected
     t_coeff = geo.Tbottom*u_transmitted
+    @info "Done"
     return u_reflected,r_coeff,u_transmitted,t_coeff
 end

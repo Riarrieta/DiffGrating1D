@@ -5,12 +5,12 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # First geometry
-geo = geometry(;λ_over_L=1.4,Δd_over_L=0.4,L=1,homogeneous=true);
-DF._check_ntd(geo.domains[3],1,0,1,1e-3)
-#DF.check_geometry(geo;ϵtol=1e-4)
-#DF._check_T_G_matrices(geo,1e-4)
-#DF._check_ntd(geo,1e-4)
-#DF.check_homogeneous_geometry(geo;ϵtol=1e-4)
+geo = geometry(;λ_over_L=1.535,Δd_over_L=0.4,L=1,homogeneous=false);
+#DF._check_ntd(geo.domains[2],1,0,1,1e-3)
+#DF.check_geometry(geo;ϵtol=1e-3)
+#DF._check_T_G_matrices(geo,1e-3)
+#DF._check_ntd(geo,1e-3)
+#DF.check_homogeneous_geometry(geo;ϵtol=1e-3)
 
 ##
 plot(geo.domains[1],tangent=false,normal=false,aspect_ratio=:equal)
@@ -18,11 +18,12 @@ plot!(geo.domains[2],tangent=false,normal=false)
 plot(geo.domains[3],tangent=false,normal=false)
 
 ## Diffraction problem
-u_reflected,r_coeff,u_transmitted,t_coeff = DF.solve_diffraction_problem(geo);
+_,r_coeff,_,_ = DF.solve_diffraction_problem(geo);
 
 # diffraction efficiencies
 _,β0 = DF.αβfactors(geo)  # β0 of incident wave
 r_eff = @. geo.βtop/β0*abs2(r_coeff)
+r_eff[geo.Jmax+1]
 t_eff = @. geo.βbottom/β0*abs2(t_coeff)   # (geo.kbottom^2*geo.βbottom)/(geo.ktop^2*β0)*abs2(t_coeff)
 
 ## Second geometry, L/λ = 1, θ = 30 degrees
