@@ -5,8 +5,8 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # First geometry
-geo = geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=true);
-DF._check_ntd(geo.domains[1],1,0,1,1e-4)
+geo = geometry(;λ_over_L=1.4,Δd_over_L=0.4,L=1,homogeneous=true);
+DF._check_ntd(geo.domains[3],1,0,1,1e-3)
 #DF.check_geometry(geo;ϵtol=1e-4)
 #DF._check_T_G_matrices(geo,1e-4)
 #DF._check_ntd(geo,1e-4)
@@ -15,7 +15,7 @@ DF._check_ntd(geo.domains[1],1,0,1,1e-4)
 ##
 plot(geo.domains[1],tangent=false,normal=false,aspect_ratio=:equal)
 plot!(geo.domains[2],tangent=false,normal=false)
-plot!(geo.domains[3],tangent=false,normal=false)
+plot(geo.domains[3],tangent=false,normal=false)
 
 ## Diffraction problem
 u_reflected,r_coeff,u_transmitted,t_coeff = DF.solve_diffraction_problem(geo);

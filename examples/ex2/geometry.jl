@@ -66,13 +66,13 @@ function geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=false)
     N5 = 40
 
     N6 = 40
-    N7 = 100
-    N8 = 100
+    N7 = 160
+    N8 = 160
     N9 = 40
 
-    N10 = 40
+    N10 = 150
     N11 = 60
-    N12 = 40
+    N12 = 150
 
     # lower domain
     domA_boundary_labels = [:bottom,:right,:top,:top,:left]
