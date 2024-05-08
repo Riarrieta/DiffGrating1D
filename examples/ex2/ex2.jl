@@ -5,9 +5,11 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # First geometry
-geo = geometry_test(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=true);
+geo = geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=true);
+DF._check_ntd(geo.domains[1],1,0,1,1e-4)
 #DF.check_geometry(geo;ϵtol=1e-4)
 #DF._check_T_G_matrices(geo,1e-4)
+#DF._check_ntd(geo,1e-4)
 #DF.check_homogeneous_geometry(geo;ϵtol=1e-4)
 
 ##

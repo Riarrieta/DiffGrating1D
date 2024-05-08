@@ -20,7 +20,7 @@ function geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=false)
     k2 = k0*sqrt(ϵ2)       # coating layer
     k3 = k0*sqrt(ϵ3)       # substrate
     kbottom = k3    # substrate on the bottom
-    Jmax = 12
+    Jmax = 7
     θ = 0/360*2π  # angle in radians
 
     kvec1 = ktop*DF.Point2D(sin(θ),-cos(θ))
@@ -59,10 +59,10 @@ function geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=false)
     φ11 = DF.curve_straight_line(c8,c9)
     φ12 = DF.curve_straight_line(c9,c5)
 
-    N1 = 40
+    N1 = 60
     N2 = 40
-    N3 = 100
-    N4 = 100
+    N3 = 150
+    N4 = 150
     N5 = 40
 
     N6 = 40
@@ -71,7 +71,7 @@ function geometry(;λ_over_L=1.7,Δd_over_L=0.4,L=1,homogeneous=false)
     N9 = 40
 
     N10 = 40
-    N11 = 40
+    N11 = 60
     N12 = 40
 
     # lower domain
