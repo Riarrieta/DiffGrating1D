@@ -7,10 +7,11 @@ include("geometry.jl")
 
 # First geometry
 Δd_over_L = 0.4
+data_file = "examples/ex2/data04.jld"
 #λlist = Float64[]
 #rlist = Float64[]
-#@save "examples/ex2/data.jld" λlist rlist
-@load "examples/ex2/data.jld" λlist rlist
+#@save data_file λlist rlist
+@load data_file λlist rlist
 
 ##
 current_λlist = range(1.5375,1.5475,step=0.0025/2)
@@ -27,9 +28,9 @@ for λ in current_λlist
     # add data
     push!(λlist,λ)
     push!(rlist,r0)
-    @save "examples/ex2/data.jld" λlist rlist
+    @save data_file λlist rlist
 end
 
 ## Plot
-@load "examples/ex2/data.jld" λlist rlist
+@load data_file λlist rlist
 scatter(λlist,rlist,xlabel="λ/L",ylabel="R₀")
