@@ -5,7 +5,10 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # First geometry
-geo = geometry(;λ_over_L=1.535,Δd_over_L=0.4,L=1,homogeneous=false);
+# r = 0.75 @ λ = 1.535
+# r = 0.96 @ λ = 1.540
+# r = 0.95 @ λ = 1.545
+geo = geometry(;λ_over_L=1.545,Δd_over_L=0.4,L=1,homogeneous=false);
 #DF._check_ntd(geo.domains[2],1,0,1,1e-3)
 #DF.check_geometry(geo;ϵtol=1e-3)
 #DF._check_T_G_matrices(geo,1e-3)
