@@ -17,7 +17,7 @@ function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,homogeneous=false)
     d0 = 0.1*L/π
     d1 = d/2
     A = Afrac*d/2  # amplitude of sinusoid
-    @assert d/2+d1>A && d/2+d0 >A
+    @assert d/2+d1>A && d/2+d0>A
     ktop = k0*sqrt(ϵ1)   # air on the top
     ktopdom = ktop       # air on top domain
     kbottomdom = k0*sqrt(ϵ2)  # dielectric
@@ -29,8 +29,8 @@ function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,homogeneous=false)
 
     c0 = DF.Point2D(0.0,0.0)
     c1 = DF.Point2D(L,0.0)
-    c2 = DF.Point2D(L,d0)
-    c3 = DF.Point2D(0.0,d0)
+    c2 = DF.Point2D(L,d0+d/2-A)
+    c3 = DF.Point2D(0.0,d0+d/2-A)
     c4 = DF.Point2D(L,d0+d+d1)
     c5 = DF.Point2D(0.0,d0+d+d1)
 
