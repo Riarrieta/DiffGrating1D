@@ -8,12 +8,13 @@ bean(t) = 0.2*DF.curve_bean(t)
 
 ext_N = 100
 int_N = 100
-w = 1
-k = sqrt(2*w^2)
+w = 15
+kext = sqrt(2*w^2)
+kint = kext
 p = 5
 r = 0.3 # circle radius
-ext_dom = DF.DomainSquare(k,ext_N,p;counterclockwise=false)
-int_dom = DF.DomainCircle(k,int_N,r)
+ext_dom = DF.DomainSquare(kext,ext_N,p;counterclockwise=false)
+int_dom = DF.DomainCircle(kint,int_N,r)
 #int_dom = DF.Domain(bean,k,int_N)
 
 y0 = DF.Point2D(0.5,0.5)     # interior eval point
@@ -24,14 +25,14 @@ sol_grad(x) = DF.ForwardDiff.gradient(sol,x)
 ∂sol∂n(x,n) = DF.rdot(sol_grad(x),n)
 sol_y0 = sol(y0)
 sol_x0 = sol(x0)
+uA = [sol(DF.point(q)) for q in ext_dom.quad]
+∂uA = [∂sol∂n(DF.point(q),DF.normal(q)) for q in ext_dom.quad]
 
 ## plot
 plot(ext_dom,tangent=false,normal=true,aspect_ratio=:equal)
 plot!(int_dom,tangent=false,normal=true)
 
 ## test NtD exterior domain
-uA = [sol(DF.point(q)) for q in ext_dom.quad]
-∂uA = [∂sol∂n(DF.point(q),DF.normal(q)) for q in ext_dom.quad]
 
 DpotA = DF.double_layer_potential(ext_dom,uA)
 SpotA = DF.single_layer_potential(ext_dom,∂uA)
@@ -66,10 +67,10 @@ sol_approxAB = SpotA(y0) - DpotA(y0) - Sba(y0) + Dba(y0)
 errorAB = abs((sol_y0-sol_approxAB)/sol_y0)
 
 ## test potential matrices
-DAB = DF.double_layer_potential_matrix(ext_dom,int_dom)
-SAB = DF.single_layer_potential_matrix(ext_dom,int_dom)
-DBA = DF.double_layer_potential_matrix(int_dom,ext_dom)
-SBA = DF.single_layer_potential_matrix(int_dom,ext_dom)
+DAB = DF.double_layer_potential_matrix(ext_dom,ext_dom,int_dom)
+SAB = DF.single_layer_potential_matrix(ext_dom,ext_dom,int_dom)
+DBA = DF.double_layer_potential_matrix(ext_dom,int_dom,ext_dom)
+SBA = DF.single_layer_potential_matrix(ext_dom,int_dom,ext_dom)
 
 DAB_result = [2*Daa(DF.point(q)) for q in int_dom.quad]  # add (-2) factor to correct kernel
 SAB_result = [2*Saa(DF.point(q)) for q in int_dom.quad]   # add (2) factor to correct kernel

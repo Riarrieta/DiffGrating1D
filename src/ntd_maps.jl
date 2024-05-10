@@ -124,10 +124,10 @@ function obtain_pure_ntd_matrices(d::DomainWithInclusion)
     SmatrixB = single_layer_matrix(int_dom)
     N2 = DmatrixB \ SmatrixB  # NtD of interior domain
     # layer potential matrices
-    DAB = double_layer_potential_matrix(ext_dom,int_dom)
-    SAB = single_layer_potential_matrix(ext_dom,int_dom)
-    DBA = double_layer_potential_matrix(int_dom,ext_dom)
-    SBA = single_layer_potential_matrix(int_dom,ext_dom)
+    DAB = double_layer_potential_matrix(ext_dom,ext_dom,int_dom)
+    SAB = single_layer_potential_matrix(ext_dom,ext_dom,int_dom)
+    DBA = double_layer_potential_matrix(ext_dom,int_dom,ext_dom)
+    SBA = single_layer_potential_matrix(ext_dom,int_dom,ext_dom)
     # auxiliary matrices
     lhs_matrix_1 = 2*N2+SmatrixB-DmatrixB*N2
     Z1 = lhs_matrix_1 \ SAB

@@ -23,5 +23,5 @@ u_reflected,r_coeff,u_transmitted,t_coeff = DF.solve_diffraction_problem(geo);
 _,β0 = DF.αβfactors(geo)  # β0 of incident wave
 r_eff = @. geo.βtop/β0*abs2(r_coeff)
 t_eff = @. geo.βbottom/β0*abs2(t_coeff)   # (geo.kbottom^2*geo.βbottom)/(geo.ktop^2*β0)*abs2(t_coeff)
-t_eff[geo.Jmax+1]  # transmission coeff zeroth order
-r_eff[geo.Jmax+1]  # reflection coeff zeroth order
+t_eff[geo.Jmax+1]  # transmitance zeroth order
+r_eff[geo.Jmax+1]  # reflectance zeroth order

@@ -5,13 +5,13 @@ end
 ∂w(::QPoint,::Domain) = true  # change of variable is identity
 ∂w(q::QPoint,::AbstractDomainWithCorners) = wprime(q)
 
-function double_layer_potential_matrix(domA::AbstractDomain,domB::AbstractDomain)
+function double_layer_potential_matrix(ext_dom::AbstractDomain,domA::AbstractDomain,domB::AbstractDomain)
     # domA: integration domain
     # domB: observation domain
     # computed with trapezoidal rule
     NA = nunknowns(domA)
     na = domA.n
-    ka = wavenumber(domA)
+    ka = wavenumber(ext_dom)
     NB = nunknowns(domB)
     D = Array{ComplexF64}(undef, NB, NA)
     for j in edge_indices(domA) # skip corner nodes
@@ -31,13 +31,13 @@ function double_layer_potential_matrix(domA::AbstractDomain,domB::AbstractDomain
     return D
 end
 
-function single_layer_potential_matrix(domA::AbstractDomain,domB::AbstractDomain)
+function single_layer_potential_matrix(ext_dom::AbstractDomain,domA::AbstractDomain,domB::AbstractDomain)
     # domA: integration domain
     # domB: observation domain
     # computed with trapezoidal rule
     NA = nunknowns(domA)
     na = domA.n
-    ka = wavenumber(domA)
+    ka = wavenumber(ext_dom)
     NB = nunknowns(domB)
     S = Array{ComplexF64}(undef, NB, NA)
     for j in edge_indices(domA) # skip corner nodes
