@@ -125,4 +125,12 @@ DF.rel_error(lhs_4,rhs_4)
 uA_approx_4 = lhs_matrix_4 \ rhs_4
 DF.rel_error(uA_approx_4,uA)
 
+norm(-SBA*Z2 + DBA*NZ2)
+norm(-SBA*Z1 + DBA*NZ1)
 
+## test obtain_ntd_map(d::DomainWithInclusion)
+dom = DF.DomainWithInclusion(ext_dom,int_dom)
+N2 = DF.obtain_ntd_map(dom)
+
+uA_approx_5 = N2 * ∂uA
+DF.rel_error(uA_approx_5,uA)
