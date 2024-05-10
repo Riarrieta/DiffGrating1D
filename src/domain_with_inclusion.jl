@@ -19,7 +19,7 @@ function double_layer_potential_matrix(domA::AbstractDomain,domB::AbstractDomain
         ∂wj = ∂w(qj,domA)
         for i in 1:NB 
             qi = qpoint(domB,i)
-            D[i,j] = π/na*double_layer_kernel(qi,qj,ka)*∂wj
+            D[i,j] = -π/na*double_layer_kernel(qi,qj,ka)*∂wj
         end
     end
     # corner nodes
