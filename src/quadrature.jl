@@ -70,6 +70,8 @@ function Domain(φ,k,N;counterclockwise=true)
     @assert length(quad) == N
     return Domain(n,k,quad,tarray,φ)
 end
+edge_indices(d::Domain) = 1:nunknowns(d)
+corner_indices(::Domain) = 1:0 # no corners
 
 struct DomainWith1Corner <: AbstractDomainWithCorners
     n::Int64     # number of points = 2n
@@ -83,7 +85,7 @@ nunknowns(d::DomainWith1Corner) = 2*d.n
 qpoint(d::DomainWith1Corner,i::Integer) = d.quad[i]
 corner_indices(::DomainWith1Corner) = 1:1  # only first qnode is a corner 
 corners(d::DomainWith1Corner) = (qpoint(d,i) for i in corner_indices(d))
-edge_indices(d::DomainWith1Corner) = 2:nunknowns(d)
+edge_indices(d::DomainWith1Corner) = 2:nunknowns(d)  # skip corner at index=1
 edges(d::DomainWith1Corner) = (qpoint(d,i) for i in edge_indices(d))
 
 # graded mesh change of variable
