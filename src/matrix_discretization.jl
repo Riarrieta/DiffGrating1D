@@ -1,11 +1,11 @@
 
 ## Potentials
-function double_layer_potential(d::Domain,ϕ)
+function double_layer_potential(d::Domain,ϕ;k=wavenumber(d))
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
         for (ϕi,qi) in zip(ϕ,d.quad)
-            result += double_layer_kernel(x...,qi,d.k)*ϕi
+            result += double_layer_kernel(x...,qi,k)*ϕi
         end
         result = (-0.5)*π/d.n*result # (-0.5) factor to correct the kernel
         return result
@@ -28,12 +28,12 @@ function double_layer_potential(d::AbstractDomainWithCorners,ϕ)
     return pot
 end
 
-function single_layer_potential(d::Domain,ϕ)
+function single_layer_potential(d::Domain,ϕ;k=wavenumber(d))
     # computed with trapezoidal rule
     function pot(x)
         result = zero(ComplexF64)
         for (ϕi,qi) in zip(ϕ,d.quad)
-            result += single_layer_kernel(x...,qi,d.k)*ϕi
+            result += single_layer_kernel(x...,qi,k)*ϕi
         end
         result = (0.5)*π/d.n*result # (0.5) factor to correct the kernel
         return result
@@ -67,10 +67,9 @@ function mk_weight(qi::QPoint,qj::QPoint,d::AbstractDomain)
     return mk_weight(param(qi),param(qj),d.n)
 end
 
-function double_layer_matrix_plus_identity(d::Domain)
+function double_layer_matrix_plus_identity(d::Domain;k=wavenumber(d))
     N = nunknowns(d)
     n = d.n
-    k = wavenumber(d)
     D = Array{ComplexF64}(undef, N, N)
     for j in 1:N
         qj = qpoint(d,j)
@@ -130,10 +129,9 @@ function double_layer_matrix_plus_identity(d::AbstractDomainWithCorners)
     return D
 end
 
-function single_layer_matrix(d::Domain)
+function single_layer_matrix(d::Domain;k=wavenumber(d))
     N = nunknowns(d)
     n = d.n
-    k = wavenumber(d)
     D = Array{ComplexF64}(undef, N, N)
     for j in 1:N
         qj = qpoint(d,j)
