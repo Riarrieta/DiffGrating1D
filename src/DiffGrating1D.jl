@@ -12,8 +12,8 @@ include("domain_multiple_corners.jl")
 include("kernels.jl")
 include("matrix_discretization.jl")
 include("geometry.jl")
-include("ntd_maps.jl")
 include("domain_with_inclusion.jl")
+include("ntd_maps.jl")
 include("geometry_tests.jl")
 
 end # module DiffGrating1D

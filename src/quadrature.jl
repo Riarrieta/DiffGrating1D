@@ -127,6 +127,12 @@ function DomainWith1Corner(φ,k,N,p;counterclockwise=true)
     return DomainWith1Corner(n,k,quad,tarray,φ)
 end
 
+## Common shapes
+function DomainCircle(k,N,r;counterclockwise=true,z=0.0)
+    φ = curve_circle(r;z)
+    return Domain(φ,k,N;counterclockwise)
+end
+
 ## Plot recipe
 @recipe function plot_domain(d::AbstractDomain;tangent=true,normal=true)
     curve_x = [q.x for q in d.quad]

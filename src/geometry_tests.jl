@@ -141,7 +141,12 @@ end
 function _is_homogeneous(geo::Geometry)
     k = geo.kbottom
     for dom in geo.domains
-        wavenumber(dom)≠k && return false
+        if dom isa DomainWithInclusion
+            (wavenumber(dom.int_dom)≠k || wavenumber(dom.ext_dom)≠k) && return false
+        else
+            wavenumber(dom)≠k && return false
+        end
+        
     end
     return true
 end

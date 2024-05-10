@@ -11,8 +11,10 @@ int_N = 100
 w = 1
 k = sqrt(2*w^2)
 p = 5
-ext_dom = DF.DomainSquare(k,ext_N,p)
-int_dom = DF.Domain(bean,k,int_N)
+r = 0.3 # circle radius
+ext_dom = DF.DomainSquare(k,ext_N,p;counterclockwise=false)
+int_dom = DF.DomainCircle(k,int_N,r)
+#int_dom = DF.Domain(bean,k,int_N)
 
 y0 = DF.Point2D(0.5,0.5)     # interior eval point
 x0 = DF.Point2D(0.0,0.0)     # interior interior eval point
@@ -128,9 +130,9 @@ DF.rel_error(uA_approx_4,uA)
 norm(-SBA*Z2 + DBA*NZ2)
 norm(-SBA*Z1 + DBA*NZ1)
 
-## test obtain_ntd_map(d::DomainWithInclusion)
+## test obtain_pure_ntd_map(d::DomainWithInclusion)
 dom = DF.DomainWithInclusion(ext_dom,int_dom)
-N2 = DF.obtain_ntd_map(dom)
+N2 = DF.obtain_pure_ntd_map(dom)
 
 uA_approx_5 = N2 * ∂uA
 DF.rel_error(uA_approx_5,uA)

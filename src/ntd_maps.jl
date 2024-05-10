@@ -113,7 +113,7 @@ function solve_diffraction_problem(geo::Geometry)
 end
 
 ## Domains with inclusion
-function obtain_ntd_map(d::DomainWithInclusion)
+function obtain_pure_ntd_matrices(d::DomainWithInclusion)
     ext_dom = d.ext_dom
     int_dom = d.int_dom
     # exterior domain
@@ -136,6 +136,16 @@ function obtain_ntd_map(d::DomainWithInclusion)
     NZ2 = N2*Z2
     lhs_matrix_2 = DmatrixA - SBA*Z2 + DBA*NZ2
     rhs_matrix_2 = SmatrixA - SBA*Z1 + DBA*NZ1
-    N1 = lhs_matrix_2 \ rhs_matrix_2   # NtD of exterior domain
+    return lhs_matrix_2, rhs_matrix_2
+end
+function obtain_pure_ntd_map(d::DomainWithInclusion)
+    lhs_matrix,rhs_matrix = obtain_pure_ntd_matrices(d)
+    N1 = lhs_matrix \ rhs_matrix   # NtD of exterior domain
     return N1
+end
+
+function obtain_ntd_matrices(domain::DomainWithInclusion)
+    ## matrices
+    lhs_matrix,rhs_matrix = obtain_pure_ntd_matrices(domain)
+    return obtain_ntd_matrices(lhs_matrix,rhs_matrix,domain)
 end

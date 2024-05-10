@@ -1,4 +1,4 @@
-struct DomainWithInclusion
+struct DomainWithInclusion <: AbstractDomain
     ext_dom::DomainMultipleCorners
     int_dom::Domain
 end
@@ -55,4 +55,30 @@ function single_layer_potential_matrix(domA::AbstractDomain,domB::AbstractDomain
         end
     end 
     return S
+end
+
+function _assemble_T_G_matrices(d::DomainWithInclusion,boundary_label::Symbol,βvec,αlist,L)
+    return _assemble_T_G_matrices(d.ext_dom,boundary_label::Symbol,βvec,αlist,L)
+end
+
+boundary_indices(d::DomainWithInclusion,label::Symbol) = boundary_indices(d.ext_dom,label)
+reduced_boundary_indices(d::DomainWithInclusion,label::Symbol) = reduced_boundary_indices(d.ext_dom,label)
+topboundary_indices(d::DomainWithInclusion) = topboundary_indices(d.ext_dom)
+bottomboundary_indices(d::DomainWithInclusion) = bottomboundary_indices(d.ext_dom)
+leftboundary_indices(d::DomainWithInclusion) = leftboundary_indices(d.ext_dom)
+rightboundary_indices(d::DomainWithInclusion) = rightboundary_indices(d.ext_dom)
+corner_indices(d::DomainWithInclusion) = corner_indices(d.ext_dom)
+edge_indices(d::DomainWithInclusion) = edge_indices(d.ext_dom)
+qpoint(d::DomainWithInclusion,i::Integer) = qpoint(d.ext_dom,i)
+
+_check_ntd(d::DomainWithInclusion,domain_idx,α0,γ,ϵtol) = _check_ntd(d.ext_dom,domain_idx,α0,γ,ϵtol)
+
+## Plot recipe
+@recipe function plot_domain(d::DomainWithInclusion;tangent=true,normal=true)
+    tangent := tangent
+    normal := normal
+    @series begin
+        d.int_dom
+    end
+    return d.ext_dom
 end

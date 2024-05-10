@@ -133,8 +133,8 @@ function DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise=true,φlab
 end
 
 ## Common shapes
-function DomainSquare(k,N,p;counterclockwise=true)
-    φlist,Nlist,plist = curves_square(N,p)
+function DomainSquare(k,N,p;counterclockwise=true,L=2.0,z=0.0)
+    φlist,Nlist,plist = curves_square(N,p;L,z)
     φlabels = [:top,:left,:bottom,:right]
     if !counterclockwise    
         φlist = _reverse_parametrizations(φlist)
