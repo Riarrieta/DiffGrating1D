@@ -152,3 +152,48 @@ function obtain_ntd_matrices(domain::DomainWithInclusion)
     lhs_matrix,rhs_matrix = obtain_pure_ntd_matrices(domain)
     return obtain_ntd_matrices(lhs_matrix,rhs_matrix,domain)
 end
+
+# Same as solve_diffraction_problem, but one single Domain
+# gets repeated vertically 'nlevels' times.
+function solve_diffraction_for_multiple_equal_domains(geo::Geometry;nlevels)
+    @assert length(geo.domains) == 1
+    @assert geo.domains[1] isa DomainWithInclusion
+    domain = geo.domains[1]
+    # initial conditions
+    γ = γfactor(geo)
+    α0,β0 = αβfactors(geo)
+    Q = -geo.Gbottom  # -iB^(2)
+    Y = I(size(Q,1))
+    # domain N matrices
+    N11,N12,N21,N22 = obtain_reduced_ntd_map(domain,γ)
+    # iterate
+    for (i) in 1:nlevels # from bottom to top
+        @info "Solving Domain $i"
+        # multiply by -1, since the normals of adyacent domains point in opposite directions
+        rmul!(Q,-one(ComplexF64))  
+        # obtain Q and Y from Domain
+        Z = (I-N11*Q) \ N12
+        Q = inv(N22+N21*Q*Z)
+        Y = Y*Z*Q
+    end
+    @info "Solving Top Domain"
+    # solve top boundary
+    topdom = topdomain(geo)
+    top_points = (point(qpoint(topdom,i)) for i in topboundary_indices(topdom))
+    L = geo.L
+    Δz = (nlevels-1)*L
+    u_inc(x) = exp(im*(α0*x[1]-β0*(x[2]+Δz)))   # incident planewave
+    u_incident = [u_inc(x) for x in top_points]   
+    β0 = geo.βtop[geo.Jmax+1]      # β of incident planewave
+    rhs = [-2*im*β0*u for u in u_incident]
+    Lmatrix = Q-geo.Gtop  # Q-iB^(1)
+    # solve and get fields
+    utop = Lmatrix\rhs
+    u_reflected = utop-u_incident
+    u_transmitted = Y*utop
+    # get reflection and transmission coeff
+    r_coeff = geo.Ttop*u_reflected
+    t_coeff = geo.Tbottom*u_transmitted
+    @info "Done"
+    return u_reflected,r_coeff,u_transmitted,t_coeff
+end

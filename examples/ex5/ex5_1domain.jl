@@ -19,7 +19,7 @@ end
 plot(fig)
 
 ## Diffraction problem
-u_reflected,r_coeff,u_transmitted,t_coeff = solve_for_multiple_same_domain(geo;nlevels);
+u_reflected,r_coeff,u_transmitted,t_coeff = DF.solve_diffraction_for_multiple_equal_domains(geo;nlevels);
 
 
 # diffraction efficiencies
