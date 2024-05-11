@@ -5,7 +5,9 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # First geometry
-geo = geometry(;nlevels=16,homogeneous=false);
+wL = 0.4
+nlevels = 8
+geo = geometry(;wL,nlevels,homogeneous=false);
 #DF.check_geometry(geo;ϵtol=1e-4)
 #DF.check_homogeneous_geometry(geo;ϵtol=1e-4)
 

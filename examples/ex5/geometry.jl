@@ -1,5 +1,5 @@
 
-function geometry(;nlevels=1,L=1,λ_over_L=2.8511,homogeneous=false)
+function geometry(;nlevels=1,L=1,wL=0.35,homogeneous=false)
     if !homogeneous
         # original structure
         ϵ1 = 1
@@ -10,6 +10,7 @@ function geometry(;nlevels=1,L=1,λ_over_L=2.8511,homogeneous=false)
         ϵ2 = 8.9
     end
     p = 5
+    λ_over_L = 1/wL  #(wL/2πc = L/λ)
     λ = λ_over_L*L
     k0 = 2π/λ
     r = 0.2*L  # radius circle
