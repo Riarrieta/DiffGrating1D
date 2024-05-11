@@ -14,6 +14,7 @@ function _check_common_nodes(bottom_domain,top_domain)
     top_domain_bottom_nodes = (qpoint(top_domain,i) for i in boundary_indices(top_domain,:bottom))
     check_foo(q1,q2) = q1.x≈q2.x && q1.y≈q2.y && rdot(normal(q1),normal(q2))≈-1  # same points, opposite normals
     check = all(check_foo(b,t) for (b,t) in zip(bottom_domain_top_nodes,top_domain_bottom_nodes))
+    #println(collect((q1.x,q2.x,q1.y,q2.y,rdot(normal(q1),normal(q2))) for (q1,q2) in zip(bottom_domain_top_nodes,top_domain_bottom_nodes)))
     return check
 end
 function _check_common_nodes(domains)

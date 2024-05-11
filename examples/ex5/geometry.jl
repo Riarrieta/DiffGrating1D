@@ -1,5 +1,5 @@
 
-function geometry(;L=1,λ_over_L=2.8511,homogeneous=false)
+function geometry(;nlevels=1,L=1,λ_over_L=2.8511,homogeneous=false)
     if !homogeneous
         # original structure
         ϵ1 = 1
@@ -30,14 +30,15 @@ function geometry(;L=1,λ_over_L=2.8511,homogeneous=false)
     function domain(;level=0,counterclockwise)
         z0 = L/2
         z = z0 + L*level
+        #println((level,z,counterclockwise))
         # exterior domain
         ext_dom = DF.DomainSquare(kext,Next,p;counterclockwise,L,z)
         # interior domain = 
         int_dom = DF.DomainCircle(kint,Nint,r;z)
         return DF.DomainWithInclusion(ext_dom,int_dom)
     end
-
-    domains = [domain(;level=0,counterclockwise=true)]
+    cc_func(level) = (-1)^level == 1
+    domains = [domain(;level=i,counterclockwise=cc_func(i)) for i in 0:nlevels-1]
     geo = DF.Geometry(domains,kbottom,ktop,L,α0,Jmax)
     return geo
 end

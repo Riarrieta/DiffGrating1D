@@ -138,19 +138,21 @@ function DomainSquare(k,N,p;counterclockwise=true,L=2.0,z=0.0)
     φlabels = [:top,:left,:bottom,:right]
     if !counterclockwise    
         φlist = _reverse_parametrizations(φlist)
+        φlabels = φlabels[end:-1:1]
         Nlist = Nlist[end:-1:1]
         plist = plist[end:-1:1]
     end
     return DomainMultipleCorners(;φlist,k,Nlist,plist,counterclockwise,φlabels)
 end
 function DomainCosines(k,N,p;counterclockwise=true)
-    return DomainCosines(k,N,N,p;counterclockwise=true)
+    return DomainCosines(k,N,N,p;counterclockwise)
 end
 function DomainCosines(k,N1,N2,p;counterclockwise=true)
     φlist,Nlist,plist = curves_cosines(N1,N2,p)
     φlabels = [:top,:bottom]
     if !counterclockwise
         φlist = _reverse_parametrizations(φlist)
+        φlabels = φlabels[end:-1:1]
         Nlist = Nlist[end:-1:1]
         plist = plist[end:-1:1]
     end
