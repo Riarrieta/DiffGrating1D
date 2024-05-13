@@ -1,5 +1,5 @@
 
-function geometry(;nlevels=1,L=1,wL=0.35,homogeneous=false)
+function geometry(;nlevels=1,L=1,wL=0.35,θ=0.0,homogeneous=false)
     if !homogeneous
         # original structure
         ϵ1 = 1
@@ -14,7 +14,7 @@ function geometry(;nlevels=1,L=1,wL=0.35,homogeneous=false)
     λ = λ_over_L*L
     k0 = 2π/λ
     r = 0.2*L  # radius circle
-    θ = 0.0/360*2π  # angle in radians
+    #θ = 0.0/360*2π  # angle in radians
     Jmax = 7
     
     ktop = k0*sqrt(ϵ1)   # air on the top
