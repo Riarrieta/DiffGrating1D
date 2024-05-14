@@ -1,5 +1,5 @@
 
-function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,homogeneous=false)
+function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,θ=0.0,homogeneous=false)
     if !homogeneous
         # original structure
         ϵ1 = 1
@@ -12,7 +12,6 @@ function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,homogeneous=false)
     p = 5
     λ = λ_over_L*L
     k0 = 2π/λ
-    θ = 0/360*2π  # angle in radians
     d = 0.8*L/π
     d0 = 0.1*L/π
     d1 = d/2

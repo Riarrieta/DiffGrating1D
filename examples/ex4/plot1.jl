@@ -46,7 +46,7 @@ plot(fig)
 
 ## Plot only one
 @load data_file data
-A_plot = 0.01
+A_plot = 0.1
 λlist_plot,t0list_plot = data[A_plot]
 scatter(λlist_plot,t0list_plot,label="A = $A_plot",xlabel="λ/L",ylabel="T₀")
 
@@ -75,7 +75,7 @@ plot!(λlist0_ord,T.(λlist0_ord),label="true")
 
 ## Final plot
 Tw(w) = T(2π/w)
-data_keys = [0.0,0.0001,0.001,0.01]
+data_keys = [0.0,0.0001,0.001,0.01,0.1]
 fig = plot(xlabel="w",ylabel="T₀")
 for A in data_keys
     λlist,t0list = data[A]
