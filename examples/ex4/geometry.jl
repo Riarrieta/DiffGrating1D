@@ -1,5 +1,5 @@
 
-function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,θ=0.0,homogeneous=false)
+function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,θ=0.0,Bfrac=0.0,homogeneous=false)
     if !homogeneous
         # original structure
         ϵ1 = 1
@@ -26,16 +26,21 @@ function geometry(;L=1,λ_over_L=1/1.9,Afrac=1,θ=0.0,homogeneous=false)
     kvec1 = ktop*DF.Point2D(sin(θ),-cos(θ))
     α0 = kvec1[1]
 
+    B = Bfrac*d/2
+    ϕ = π/15
+    φ3func(x) = B*cos(2*(2π/L)*x+ϕ)
+
     c0 = DF.Point2D(0.0,0.0)
     c1 = DF.Point2D(L,0.0)
-    c2 = DF.Point2D(L,d0+d/2-A)
-    c3 = DF.Point2D(0.0,d0+d/2-A)
+    c2 = DF.Point2D(L,d0+d/2-A+φ3func(L))
+    c3 = DF.Point2D(0.0,d0+d/2-A+φ3func(0))
     c4 = DF.Point2D(L,d0+d+d1)
     c5 = DF.Point2D(0.0,d0+d+d1)
 
+    φ1(t) = DF.Point2D(t/(2π)*L,φ1func(t/(2π)*L))
     φ1 = DF.curve_straight_line(c0,c1)
     φ2 = DF.curve_straight_line(c1,c2)
-    φ3(t) = DF.Point2D(L*(1-t/(2π)),-A*cos(2π*(1-t/(2π)))+(d0+d/2))
+    φ3(t) = DF.Point2D(L*(1-t/(2π)),-A*cos(2π*(1-t/(2π)))+(d0+d/2)+φ3func(L*(1-t/(2π))))
     φ4 = DF.curve_straight_line(c3,c0)
     φ6 = DF.curve_straight_line(c4,c2)
     φ7 = DF.curve_straight_line(c5,c4)
