@@ -8,7 +8,7 @@ include("geometry.jl")
 
 # geometry
 data_file = "examples/ex4/data_w_kx_T.jld"
-Afrac = 0.01
+Afrac = 0.5
 dh = 0.005 # step in both w̃ and α̃
 #αlist = range(0,0.5,step=dh)
 #wLlist = range(0.5+dh,0.9,step=dh)
@@ -40,6 +40,13 @@ Threads.@threads for j in 1:length(wLlist)
     end
 end
 @save data_file αlist wLlist tlist
+
+## Plot slice
+@load data_file αlist wLlist tlist
+index = 75
+α = αlist[index]
+tα = tlist[index,:]
+plot(wLlist,tα)
 
 ## Final plot
 @load data_file αlist wLlist tlist
