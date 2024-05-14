@@ -43,7 +43,7 @@ end
 
 ## Plot slice
 @load data_file αlist wLlist tlist
-index = 75
+index = 50
 α = αlist[index]
 tα = tlist[index,:]
 plot(wLlist,tα)
