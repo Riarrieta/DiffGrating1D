@@ -7,11 +7,11 @@ const DF = DiffGrating1D
 include("geometry.jl")
 
 # geometry
-data_file = "examples/ex4/data_w_kx_T.jld"
+data_file = "examples/ex4/data_w_kx_T_v2.jld"
 Afrac = 0.5
 dh = 0.005 # step in both w̃ and α̃
 #αlist = range(0,0.5,step=dh)
-#wLlist = range(0.5+dh,0.9,step=dh)
+#wLlist = range(0.0,0.5,step=dh)
 #tlist = zeros(Float64,length(αlist),length(wLlist))
 #@save data_file αlist wLlist tlist
 @load data_file αlist wLlist tlist
@@ -22,6 +22,10 @@ total = length(wLlist)*length(αlist)
 Threads.@threads for j in 1:length(wLlist)
     wL = wLlist[j]
     for (i,α) in enumerate(αlist)
+        if α ≥ wL
+            tlist[i,j] = NaN
+            continue
+        end
         @info "Computing α = $α, wL = $wL"        
         #@info "Progress $progress/$total"
         #progress +=1
@@ -50,6 +54,8 @@ plot(wLlist,tα)
 
 ## Final plot
 @load data_file αlist wLlist tlist
-heatmap(αlist,wLlist,transpose(tlist),xlabel="kₓa/2π",ylabel="ωa/2πc",c=:hot,clims=(0,1))
+tplot = copy(tlist)
+tplot[isnan.(tplot)] .= 0.0
+heatmap(αlist,wLlist,transpose(tlist),grid=false,xlabel="kₓa/2π",ylabel="ωa/2πc",c=:hot,clims=(0,1))
 xlims!(0.0,0.5)
 ylims!(0.5+dh,0.9)
